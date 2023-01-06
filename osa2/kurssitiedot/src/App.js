@@ -2,6 +2,7 @@ import React from "react";
 import Course from "./Course";
 
 const App = () => {
+
     const courses = [
       {
         name: 'Half Stack application development',
