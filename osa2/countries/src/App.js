@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Countries = ({countries, handleClick}) => (
+const Countries = ({ countries, handleClick }) => (
     <div>
         {countries.map(country => (
             <>
                 <p key={country.name.common}>{country.name.common}</p>
                 <p>
                     <button key={country.name.common} onClick={handleClick(country.name.common)}>show</button>
-                 </p>
+                </p>
             </>
         ))}
     </div>
 )
 
-const Country = ({country}) => (
+const Country = ({ country }) => (
     <div>
         <h1>{country.name.common}</h1>
         capital {country.capital[0]}
@@ -29,9 +29,9 @@ const Country = ({country}) => (
     </div>
 )
 
-const Weather = ({city}) => {
+const Weather = ({ city }) => {
     const [currentWeather, setCurrentWeather] = useState({});
-    
+
     useEffect(() => {
         axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`)
             .then(response => {
@@ -43,7 +43,7 @@ const Weather = ({city}) => {
                     .then(response => {
                         setCurrentWeather(response.data.current_weather);
                     })
-                })
+            })
     }, []);
 
     return (
@@ -73,10 +73,8 @@ const App = () => {
         setFilter(event.target.value);
     }
 
-    const handleClick = (name) => {
-        return () => {
-            setFilter(name);
-        }
+    const handleClick = (name) => () => {
+        setFilter(name);
     }
 
     const filteredCountries = countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()));
