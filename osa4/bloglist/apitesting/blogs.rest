@@ -1,0 +1,12 @@
+GET http://localhost:3001/api/blogs
+
+###
+POST http://localhost:3001/api/blogs
+Content-Type : application/json
+
+{
+    "title": "testiblogi",
+    "author": "minävain",
+    "url": "localhost:3001",
+    "likes": 5
+}
