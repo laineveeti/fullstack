@@ -10,3 +10,10 @@ Content-Type : application/json
     "url": "localhost:3001",
     "likes": 5
 }
+###
+PUT http://localhost:3001/api/blogs/63c6ca1fb0152ad35a59b7c9
+Content-Type: application/json
+
+{
+    "likes": 10
+}
