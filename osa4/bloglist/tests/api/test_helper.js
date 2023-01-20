@@ -1,4 +1,5 @@
-const Blog = require('../models/blog');
+const Blog = require('../../models/blog');
+const User = require('../../models/user');
 
 const initialBlogs = [
     {
@@ -15,9 +16,28 @@ const initialBlogs = [
     }
 ];
 
+const initialUsers = [
+    {
+        username: 'user1',
+        name: 'käyttäjä',
+        password: 'salasana'
+    },
+    {
+        username: 'user2',
+        name: 'käyttäjä toinen',
+        password: 'salasana'
+    },
+];
+
+
 const blogsInDb = async () => {
     const blogs = await Blog.find({});
     return blogs.map(blog => blog.toJSON());
+};
+
+const usersInDb = async () => {
+    const users = await User.find({});
+    return users.map(user => user.toJSON());
 };
 
 const invalidId = async () => {
@@ -27,4 +47,4 @@ const invalidId = async () => {
     return toBeDeleted._id.toString();
 };
 
-module.exports = { initialBlogs, blogsInDb, invalidId };
+module.exports = { initialBlogs, initialUsers, blogsInDb, usersInDb, invalidId };

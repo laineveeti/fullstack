@@ -2,15 +2,24 @@ const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
 
 blogsRouter.get('', async (request, response) => {
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 });
     response.json(blogs);
 });
 
 blogsRouter.post('', async (request, response) => {
-    const blogObj = request.body;
-    blogObj.likes = blogObj.likes ? blogObj.likes : 0;
-    const blog = new Blog(blogObj);
+    const user = request.authorization;
+    if(!user) {
+        return response.status(401).json({ error: 'token missing or invalid' });
+    }
+
+    const body = request.body;
+    body.likes = body.likes ? body.likes : 0;
+    body.user = user._id;
+
+    const blog = new Blog(body);
     const savedBlog = await blog.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
     response.status(201).json(savedBlog);
 });
 

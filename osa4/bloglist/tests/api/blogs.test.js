@@ -1,18 +1,36 @@
 const mongoose = require('mongoose');
-const app = require('../app');
+const bcrypt = require('bcrypt');
+const app = require('../../app');
 const supertest = require('supertest');
 const api = supertest(app);
-const Blog = require('../models/blog');
-const { initialBlogs, blogsInDb, invalidId } = require('./test_helper');
+const Blog = require('../../models/blog');
+const User = require('../../models/user');
+const { initialBlogs, initialUsers, blogsInDb, invalidId } = require('./test_helper');
+
+const getToken = async () => {
+    return (await api
+        .post('/')
+        .send({ username: 'user1', password: 'salasana' }))
+        .body.token;
+};
 
 beforeEach(async () => {
     await Blog.deleteMany({});
+    await User.deleteMany({});
+
+    await Promise.all(initialUsers.map(async user => {
+        const newUser = new User({
+            username: user.username,
+            name: user.name,
+            password: await bcrypt.hash(user.password, 10)
+        });
+        return await newUser.save();
+    }));
 
     await Promise.all(initialBlogs.map(blog => {
         const newBlog = Blog(blog);
         return newBlog.save();
     }));
-    console.log('initialized blogs');
 });
 
 describe('GET api/blogs', () => {
@@ -32,6 +50,11 @@ describe('GET api/blogs', () => {
         const response = await api.get('/api/blogs');
         expect(response.body[0].id).toBeDefined();
     });
+
+    test('populates blogs with their users', async () => {
+        const response = await api.get('/api/blogs');
+        expect(response.body[0].user.id).toBeDefined();
+    });
 });
 
 describe('POST api/blogs', () => {
@@ -43,31 +66,40 @@ describe('POST api/blogs', () => {
     };
 
     test('response has status 400 when title or url is missing', async () => {
+        const token = await getToken();
+
         const blogWithMissingProps = { ... newBlog };
         delete blogWithMissingProps.title, blogWithMissingProps.url;
 
         await api
             .post('/api/blogs')
+            .set('authorization', `bearer ${token}`)
             .send(blogWithMissingProps)
             .expect(400);
     });
 
     test('increases blog count by one', async () => {
-        await api.post('/api/blogs').send(newBlog);
+        const token = await getToken();
+
+        await api
+            .post('/api/blogs')
+            .set('authorization', `bearer ${token}`)
+            .send(newBlog);
         const blogsAtEnd = await blogsInDb();
         expect(blogsAtEnd).toHaveLength(initialBlogs.length + 1);
     });
 
-    test('saves blog with correct properties', async () => {
-        const response = await api.post('/api/blogs').send(newBlog);
-        delete response.body.id;
-        expect(response.body).toEqual(newBlog);
+    test('saves blog with user property', async () => {
+        const token = await getToken();
+        const response = await api.post('/api/blogs').set('authorization', `bearer ${token}`).send(newBlog);
+        expect(response.body.user).toBeDefined();
     });
 
     test('gives property "likes" a default value of 0', async () => {
+        const token = await getToken();
         const blogWith0Likes = { ... newBlog };
         delete blogWith0Likes.likes;
-        const response = await api.post('/api/blogs').send(blogWith0Likes);
+        const response = await api.post('/api/blogs').set('authorization', `bearer ${token}`).send(blogWith0Likes);
         expect(response.body.likes).toBe(0);
     });
 });
