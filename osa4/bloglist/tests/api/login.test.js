@@ -12,9 +12,12 @@ beforeEach(async () => {
     await User.deleteMany({});
 
     await Promise.all(initialUsers.map(async user => {
-        user.password = await bcrypt.hash(user.password.plaintext, 10);
-        const newUser = User(user);
-        return newUser.save();
+        const newUser = new User({
+            username: user.username,
+            name: user.name,
+            password: await bcrypt.hash(user.password, 10)
+        });
+        return await newUser.save();
     }));
 });
 

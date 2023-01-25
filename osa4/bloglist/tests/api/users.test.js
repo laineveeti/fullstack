@@ -12,15 +12,24 @@ beforeEach(async () => {
     await User.deleteMany({});
 
     await Promise.all(initialUsers.map(async user => {
-        user.password = await bcrypt.hash(user.password, 10);
-        const newUser = User(user);
-        return newUser.save();
+        const newUser = new User({
+            username: user.username,
+            name: user.name,
+            password: await bcrypt.hash(user.password, 10)
+        });
+        return await newUser.save();
     }));
 
-    await Promise.all(initialBlogs.map(blog => {
+    const someUser = await User.findOne({});
+
+    const savedBlogs = await Promise.all(initialBlogs.map(blog => {
         const newBlog = Blog(blog);
+        newBlog.user = someUser._id;
         return newBlog.save();
     }));
+
+    someUser.blogs = savedBlogs.map(blog => blog._id);
+    await someUser.save();
 });
 
 describe('POST api/users', () => {
@@ -93,7 +102,7 @@ describe('GET api/users', () => {
 
     test('populates users with their added blogs', async () => {
         const response = await api.get('/api/users');
-        expect(response.body[0].blogs.id).toBeDefined();
+        expect(response.body[0].blogs[0].id).toBeDefined();
     });
 });
 

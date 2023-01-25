@@ -27,10 +27,16 @@ beforeEach(async () => {
         return await newUser.save();
     }));
 
-    await Promise.all(initialBlogs.map(blog => {
+    const someUser = await User.findOne({});
+
+    const savedBlogs = await Promise.all(initialBlogs.map(blog => {
         const newBlog = Blog(blog);
+        newBlog.user = someUser._id;
         return newBlog.save();
     }));
+
+    someUser.blogs = savedBlogs.map(blog => blog._id);
+    await someUser.save();
 });
 
 describe('GET api/blogs', () => {
