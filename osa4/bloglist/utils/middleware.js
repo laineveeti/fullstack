@@ -1,3 +1,7 @@
+const config = require('../utils/config');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+
 const errorHandler = (error, request, response, next) => {
     console.error(error);
 
@@ -6,7 +10,7 @@ const errorHandler = (error, request, response, next) => {
     } else if (error.name === 'invalidIdError') {
         response.status(404).send({ error: error.message });
     } else if (error.name === 'JsonWebTokenError') {
-        response.status(401).json({ error: 'invalid token' });
+        response.status(401).json({ error: 'missing token' });
     } else if (error.name === 'TokenExpiredError') {
         response.status(401).json({ error: 'expired token' });
     }
@@ -23,4 +27,17 @@ const tokenExtractor = async (request, response, next) => {
     next();
 };
 
-module.exports = { errorHandler, tokenExtractor };
+const userExtractor = async (request, response, next) => {
+    const decodedToken = jwt.verify(request.token, config.SECRET);
+    if(decodedToken.id) {
+        const user = await User.findById(decodedToken.id);
+        if(!user) {
+            response.status(401).json({ error: 'invalid token' });
+        }
+        request.user = user;
+    }
+
+    next();
+};
+
+module.exports = { errorHandler, tokenExtractor, userExtractor };

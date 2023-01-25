@@ -27,7 +27,7 @@ beforeEach(async () => {
         return await newUser.save();
     }));
 
-    const someUser = await User.findOne({});
+    const someUser = await User.findOne({ username: 'user1' });
 
     const savedBlogs = await Promise.all(initialBlogs.map(blog => {
         const newBlog = Blog(blog);
@@ -111,25 +111,52 @@ describe('POST api/blogs', () => {
 });
 
 describe('DELETE api/blogs/id', () => {
-    test('succesfully removes resource when given valid id', async () => {
+    test('succesfully removes resource when given valid id and token', async () => {
+        const token = await getToken();
         const toDelete = (await blogsInDb())[0].id;
-        await api.delete(`/api/blogs/${toDelete}`);
+        await api
+            .delete(`/api/blogs/${toDelete}`)
+            .set('authorization', `bearer ${token}`);
+
         const blogsAtEnd = await blogsInDb();
         expect(blogsAtEnd).toHaveLength(initialBlogs.length - 1);
     });
 
     test('returns status code 204 on removal', async () => {
+        const token = await getToken();
         const toDelete = (await blogsInDb())[0].id;
         await api
             .delete(`/api/blogs/${toDelete}`)
+            .set('authorization', `bearer ${token}`)
             .expect(204);
     });
 
     test('returns status code 404 on invalid id', async () => {
+        const token = await getToken();
         const toDelete = await invalidId();
         await api
             .delete(`/api/blogs/${toDelete}`)
+            .set('authorization', `bearer ${token}`)
             .expect(404);
+    });
+
+    test('returns status code 401 on missing token', async () => {
+        const toDelete = (await blogsInDb())[0].id;
+        await api
+            .delete(`/api/blogs/${toDelete}`)
+            .expect(401);
+    });
+
+    test('returns status code 401 if user is not authorized to delete the blog', async () => {
+        const wrongUserToken = (await api
+            .post('/')
+            .send({ username: 'user2', password: 'salasana' }))
+            .body.token;
+        const toDelete = (await blogsInDb())[0].id;
+        await api
+            .delete(`/api/blogs/${toDelete}`)
+            .set('authorization', `bearer ${wrongUserToken}`)
+            .expect(401);
     });
 });
 
