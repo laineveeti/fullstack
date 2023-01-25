@@ -1,7 +1,3 @@
-const config = require('./config');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-
 const errorHandler = (error, request, response, next) => {
     console.error(error);
 
@@ -18,25 +14,13 @@ const errorHandler = (error, request, response, next) => {
     next();
 };
 
-const getToken = (request) => {
+const tokenExtractor = async (request, response, next) => {
     const authorization = request.get('authorization');
     if(authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        return authorization.substring(7);
-    }
-    return null;
-};
-
-const authorize = async (request, response, next) => {
-    const token = getToken(request);
-    if(token) {
-        const decodedToken = jwt.verify(token, config.SECRET);
-        if(decodedToken.id) {
-            const user = await User.findById(decodedToken.id);
-            request.authorization = user;
-        }
+        request.token = authorization.substring(7);
     }
 
     next();
 };
 
-module.exports = { errorHandler, authorize };
+module.exports = { errorHandler, tokenExtractor };
