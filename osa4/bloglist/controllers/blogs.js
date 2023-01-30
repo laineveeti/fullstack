@@ -7,6 +7,16 @@ blogsRouter.get('', async (request, response) => {
     response.json(blogs);
 });
 
+blogsRouter.get('/:id', async (request, response) => {
+    const blog = await Blog.findById(request.params.id);
+    if(!blog) {
+        const invalidIdError = new Error('blog with id does not exist!');
+        invalidIdError.name = 'invalidIdError';
+        throw invalidIdError;
+    }
+    response.json(blog);
+});
+
 blogsRouter.post('', userExtractor, async (request, response) => {
     const user = request.user;
 

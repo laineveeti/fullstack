@@ -1,26 +1,24 @@
-import { useState, useEffect } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
-import CreateForm from './components/CreateForm'
-import LoginForm from './components/LoginForm'
-import login from './services/login'
-import Notification from './components/Notification'
+import { useState, useEffect, useRef } from 'react';
+import Blog from './components/Blog';
+import blogService from './services/blogs';
+import CreateForm from './components/CreateForm';
+import LoginForm from './components/LoginForm';
+import login from './services/login';
+import Notification from './components/Notification';
+import Toggleable from './components/Toggleable';
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
     const [user, setUser] = useState(null);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [title, setTitle] = useState('');
-    const [author, setAuthor] = useState('');
-    const [url, setUrl] = useState('');
     const [notification, setNotification] = useState(null);
     const [notificationColor, setNotificationColor] = useState('white');
 
     useEffect(() => {
         blogService.getAll().then(blogs =>
-        setBlogs( blogs )
-        )  
+            setBlogs(blogs)
+        );
     }, []);
 
     useEffect(() => {
@@ -41,29 +39,53 @@ const App = () => {
             setUser(user);
             setUsername('');
             setPassword('');
-        } catch (error) {
+        } catch (exception) {
             displayErrorNotification('wrong username or password');
         }
-    }
+    };
 
     const logout = () => {
         window.localStorage.removeItem('loggedBloglistUser');
         setUser(null);
         blogService.emptyToken();
-    }
+    };
 
-    const createBlog = async (event) => {
-        event.preventDefault();
+    const addBlog = async (blogData) => {
         try{
-            const newBlog = await blogService.createNew({ title, author, url });
-            setTitle('');
-            setAuthor('');
-            setUrl('');
+            const newBlog = await blogService.createNew(blogData);
+            newBlog.user = {
+                username : user.username
+            };
             setBlogs(blogs.concat(newBlog));
-
+            createFormRef.current.toggleVisibility();
             displayNotification(`a new blog ${newBlog.title} by ${newBlog.author} added`, 'green');
-        } catch (error) {
-            displayErrorNotification(error.message);
+        } catch (exception) {
+            displayErrorNotification(exception);
+        }
+    };
+
+    const likeBlog = (id) => async () => {
+        try {
+            const updatedBlog = await blogService.like(id);
+            setBlogs(blogs.map(blog => {
+                if(blog.id === updatedBlog.id) {
+                    blog.likes = updatedBlog.likes;
+                }
+                return blog;
+            }));
+        } catch (exception) {
+            displayErrorNotification(exception);
+        }
+    };
+
+    const removeBlog = (id) => async () => {
+        try {
+            if(window.confirm(`Remove blog ${blogs.find(blog => blog.id === id).title}?`)) {
+                await blogService.remove(id);
+                setBlogs(blogs.filter(blog => blog.id !== id));
+            }
+        } catch (exception) {
+            displayErrorNotification(exception);
         }
     };
 
@@ -72,13 +94,15 @@ const App = () => {
         setNotificationColor(color);
         setTimeout(() => {
             setNotification(null);
-           // setNotificationColor('white');
+            setNotificationColor('white');
         }, 4000);
     };
 
     const displayErrorNotification = msg => {
         displayNotification(msg, 'red');
     };
+
+    const createFormRef = useRef();
 
     return user
         ? <div>
@@ -87,19 +111,19 @@ const App = () => {
             <button onClick={logout}>logout</button>
             <br></br>
             <h2>create new</h2>
-            <CreateForm
-                create={createBlog}
-                title={title}
-                setTitle={setTitle}
-                author= {author}
-                setAuthor={setAuthor}
-                url={url}
-                setUrl={setUrl}
-            />
+            <Toggleable showLabel='create new blog' hideLabel='cancel' ref={createFormRef}>
+                <CreateForm addBlog={addBlog} />
+            </Toggleable>
             <br></br>
             <h2>blogs</h2>
-            {blogs.map(blog =>
-                <Blog key={blog.id} blog={blog} />
+            {blogs.sort((a, b) => a.likes - b.likes).map(blog =>
+                <Blog
+                    key={blog.id}
+                    blog={blog}
+                    likeBlog={likeBlog}
+                    removeBlog={removeBlog}
+                    user={user}
+                />
             )}
         </div>
         : <div>
@@ -112,7 +136,7 @@ const App = () => {
                 setPassword={setPassword}
                 handleLogin={handleLogin}
             />
-        </div>
-}
+        </div>;
+};
 
-export default App
+export default App;

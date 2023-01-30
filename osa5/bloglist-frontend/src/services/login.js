@@ -1,10 +1,16 @@
 import axios from 'axios';
+import serviceUtils from './utils';
 
 const baseUrl = '/';
 
 const login = async (credentials) => {
-    const user = await axios.post(baseUrl, credentials);
-    return user.data;
-}
+    try {
+        const user = await axios.post(baseUrl, credentials);
+        return user.data;
+    } catch (exception) {
+        serviceUtils.handleAxiosError(exception);
+    }
+
+};
 
 export default login;
