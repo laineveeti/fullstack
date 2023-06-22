@@ -7,7 +7,7 @@ const CreateForm = ({ addBlog }) => {
 
     const createBlog = (event) => {
         event.preventDefault();
-        addBlog({ title, author, url });
+        addBlog({ title: title, author: author, url: url });
         setTitle('');
         setAuthor('');
         setUrl('');
@@ -16,15 +16,15 @@ const CreateForm = ({ addBlog }) => {
     return (
         <form onSubmit={createBlog}>
             title:
-            <input name='Title' value={title} type='text' required
+            <input name='Title' value={title} type='text' id='title-input' required
                 onChange={({ target }) => setTitle(target.value)}/>
             <br></br>
             author:
-            <input name='Author' value={author} type='text'
+            <input name='Author' value={author} id='author-input' type='text'
                 onChange={({ target }) => setAuthor(target.value)}/>
             <br></br>
             url:
-            <input name='Url' value={url} type='text' required
+            <input name='Url' value={url} id='url-input' type='text' required
                 onChange={({ target }) => setUrl(target.value)}/>
             <br></br>
             <button type='submit'>create</button>

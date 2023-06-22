@@ -17,12 +17,12 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
                 <Toggleable showLabel='view' hideLabel='hide' key={blog.id}>
                     {blog.url}
                     <br></br>
-                    likes {blog.likes}
+                    likes: {blog.likes}
                     <button onClick={likeBlog(blog.id)}>like</button>
                     <br></br>
                     {blog.user.username}
                     <br></br>
-                    {blog.user.username === user.username
+                    {blog.user.id === user.id
                         ? <button onClick={removeBlog(blog.id)}>remove</button>
                         : null
                     }
