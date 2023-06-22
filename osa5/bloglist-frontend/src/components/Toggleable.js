@@ -16,24 +16,24 @@ const Toggleable = forwardRef((props, ref) => {
     });
 
     return (
-        <>
-            <span style={hideWhenVisible}>
+        <div>
+            <div style={hideWhenVisible}>
                 <button onClick={toggleVisibility}>{props.showLabel}</button>
-            </span>
-            <span style={showWhenVisible}>
-                <button onClick={toggleVisibility}>{props.hideLabel}</button>
-            </span>
+            </div>
             <div style={showWhenVisible}>
                 {props.children}
+                <br></br>
+                <button onClick={toggleVisibility}>{props.hideLabel}</button>
             </div>
-        </>
+        </div>
     );
 });
 
 Toggleable.displayName = 'Toggleable';
 
 Toggleable.propTypes = {
-    showLabel: PropTypes.string.isRequired
+    showLabel: PropTypes.string.isRequired,
+    hideLabel: PropTypes.string.isRequired
 };
 
 export default Toggleable;

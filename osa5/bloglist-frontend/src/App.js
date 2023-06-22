@@ -40,7 +40,7 @@ const App = () => {
             setUsername('');
             setPassword('');
         } catch (exception) {
-            displayErrorNotification('wrong username or password');
+            displayErrorNotification(exception);
         }
     };
 
@@ -104,9 +104,9 @@ const App = () => {
 
     const createFormRef = useRef();
 
-    return user
-        ? <div>
-            <Notification msg={notification} color={notificationColor} />
+    return <div>
+        <Notification msg={notification} color={notificationColor} />
+        {user ? <div>
             {user.username} logged in
             <button onClick={logout}>logout</button>
             <br></br>
@@ -125,18 +125,15 @@ const App = () => {
                     user={user}
                 />
             )}
-        </div>
-        : <div>
-            <Notification msg={notification} color={notificationColor} />
-            <h2>log in to application</h2>
-            <LoginForm
-                username={username}
-                password={password}
-                setUsername={setUsername}
-                setPassword={setPassword}
-                handleLogin={handleLogin}
-            />
-        </div>;
+        </div> : <LoginForm
+            username={username}
+            password={password}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+        />
+        }
+    </div>;
 };
 
 export default App;

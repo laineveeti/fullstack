@@ -5,9 +5,10 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
         paddingTop: 10,
         paddingLeft: 2,
         border: 'solid',
-        borderWidth: 1,
+        borderWidth: 2,
         marginBottom: 5
     };
+
 
     return (
         <div style={blogStyle}>
