@@ -1,7 +1,7 @@
 import axios from 'axios';
 import serviceUtils from './utils';
 
-const baseUrl = '/';
+const baseUrl = '/api/login';
 
 const login = async (credentials) => {
     try {

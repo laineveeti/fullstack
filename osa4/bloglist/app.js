@@ -21,9 +21,15 @@ mongoose.connect(config.MONGODB_URI)
 app.use(cors());
 app.use(express.json());
 app.use(tokenExtractor);
-app.use('/', loginRouter);
+app.use('/api/login', loginRouter);
 app.use('/api/blogs', blogsRouter);
 app.use('/api/users', userRouter);
+
+if(process.env.NODE_ENV === 'test') {
+    const testingRouter = require('./controllers/testing');
+    app.use('/api/testing', testingRouter);
+}
+
 app.use(errorHandler);
 
 module.exports = app;
