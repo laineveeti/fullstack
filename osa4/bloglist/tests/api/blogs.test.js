@@ -8,10 +8,11 @@ const User = require('../../models/user');
 const { initialBlogs, initialUsers, blogsInDb, invalidId } = require('./test_helper');
 
 const getToken = async () => {
-    return (await api
-        .post('/')
+    const token = (await api
+        .post('/api/login')
         .send({ username: 'user1', password: 'salasana' }))
         .body.token;
+    return token;
 };
 
 beforeEach(async () => {
@@ -79,7 +80,7 @@ describe('POST api/blogs', () => {
 
         await api
             .post('/api/blogs')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `Bearer ${token}`)
             .send(blogWithMissingProps)
             .expect(400);
     });
@@ -89,7 +90,7 @@ describe('POST api/blogs', () => {
 
         await api
             .post('/api/blogs')
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `Bearer ${token}`)
             .send(newBlog);
         const blogsAtEnd = await blogsInDb();
         expect(blogsAtEnd).toHaveLength(initialBlogs.length + 1);
@@ -97,7 +98,7 @@ describe('POST api/blogs', () => {
 
     test('saves blog with user property', async () => {
         const token = await getToken();
-        const response = await api.post('/api/blogs').set('authorization', `bearer ${token}`).send(newBlog);
+        const response = await api.post('/api/blogs').set('authorization', `Bearer ${token}`).send(newBlog);
         expect(response.body.user).toBeDefined();
     });
 
@@ -105,7 +106,7 @@ describe('POST api/blogs', () => {
         const token = await getToken();
         const blogWith0Likes = { ... newBlog };
         delete blogWith0Likes.likes;
-        const response = await api.post('/api/blogs').set('authorization', `bearer ${token}`).send(blogWith0Likes);
+        const response = await api.post('/api/blogs').set('authorization', `Bearer ${token}`).send(blogWith0Likes);
         expect(response.body.likes).toBe(0);
     });
 });
@@ -116,7 +117,7 @@ describe('DELETE api/blogs/id', () => {
         const toDelete = (await blogsInDb())[0].id;
         await api
             .delete(`/api/blogs/${toDelete}`)
-            .set('authorization', `bearer ${token}`);
+            .set('authorization', `Bearer ${token}`);
 
         const blogsAtEnd = await blogsInDb();
         expect(blogsAtEnd).toHaveLength(initialBlogs.length - 1);
@@ -127,7 +128,7 @@ describe('DELETE api/blogs/id', () => {
         const toDelete = (await blogsInDb())[0].id;
         await api
             .delete(`/api/blogs/${toDelete}`)
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `Bearer ${token}`)
             .expect(204);
     });
 
@@ -136,7 +137,7 @@ describe('DELETE api/blogs/id', () => {
         const toDelete = await invalidId();
         await api
             .delete(`/api/blogs/${toDelete}`)
-            .set('authorization', `bearer ${token}`)
+            .set('authorization', `Bearer ${token}`)
             .expect(404);
     });
 
@@ -155,7 +156,7 @@ describe('DELETE api/blogs/id', () => {
         const toDelete = (await blogsInDb())[0].id;
         await api
             .delete(`/api/blogs/${toDelete}`)
-            .set('authorization', `bearer ${wrongUserToken}`)
+            .set('authorization', `Bearer ${wrongUserToken}`)
             .expect(401);
     });
 });
