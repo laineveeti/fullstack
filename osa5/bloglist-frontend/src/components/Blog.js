@@ -11,23 +11,21 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
 
 
     return (
-        <div style={blogStyle}>
-            <div>
-                {blog.title} {blog.author}
-                <Toggleable showLabel='view' hideLabel='hide' key={blog.id}>
-                    {blog.url}
-                    <br></br>
-                    likes: {blog.likes}
-                    <button onClick={likeBlog(blog.id)}>like</button>
-                    <br></br>
-                    {blog.user.username}
-                    <br></br>
-                    {blog.user.id === user.id
-                        ? <button onClick={removeBlog(blog.id)}>remove</button>
-                        : null
-                    }
-                </Toggleable>
-            </div>
+        <div className='blog' style={blogStyle}>
+            {blog.title} {blog.author}
+            <Toggleable showLabel='view' hideLabel='hide' key={blog.id}>
+                {blog.url}
+                <br></br>
+                likes: {blog.likes}
+                <button onClick={likeBlog(blog.id)}>like</button>
+                <br></br>
+                {blog.user.username}
+                <br></br>
+                {blog.user.id === user.id
+                    ? <button onClick={removeBlog(blog.id)}>remove</button>
+                    : null
+                }
+            </Toggleable>
         </div>
     );};
 

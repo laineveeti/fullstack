@@ -80,5 +80,22 @@ describe('Bloglist app', function() {
                 cy.should('not.contain', 'remove');
             });
         });
+
+        describe('blogs are ordered correctly', function() {
+            beforeEach(function() {
+                cy.createBlog({ title: 'title1', author: 'author1', url: 'url1' });
+                cy.createBlog({ title: 'title2', author: 'author2', url: 'url2' });
+                cy.visit('');
+                cy.contains('title1').find('button').contains('view').click();
+                cy.contains('title2').find('button').contains('view').click();
+            });
+
+            it.only('the blog with more likes will be displayed first', function() {
+                cy.likeBlog('title1');
+                cy.wait(200);
+                cy.get('.blog').eq(0).should('contain', 'title1');
+                cy.get('.blog').eq(1).should('contain', 'title2');
+            });
+        });
     });
 });

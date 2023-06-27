@@ -17,3 +17,8 @@ Cypress.Commands.add('createBlog', ({ title, author, url }) => {
         }
     });
 });
+
+Cypress.Commands.add('likeBlog', ( title ) => {
+    cy.get('.blog').contains(title).as('blog');
+    cy.get('@blog').find('button').contains('like').click();
+});
