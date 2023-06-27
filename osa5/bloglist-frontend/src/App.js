@@ -32,11 +32,10 @@ const App = () => {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-            const user = await login({ username, password });
-            window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user));
-            blogService.setToken(user.token);
-
-            setUser(user);
+            const loggedInUser = await login({ username, password });
+            window.localStorage.setItem('loggedBloglistUser', JSON.stringify(loggedInUser));
+            blogService.setToken(loggedInUser.token);
+            setUser(loggedInUser);
             setUsername('');
             setPassword('');
         } catch (exception) {
@@ -54,7 +53,9 @@ const App = () => {
         try{
             const newBlog = await blogService.createNew(blogData);
             newBlog.user = {
-                username : user.username
+                id: user.id,
+                username: user.username,
+                name: user.name
             };
             setBlogs(blogs.concat(newBlog));
             createFormRef.current.toggleVisibility();
@@ -116,15 +117,15 @@ const App = () => {
             </Toggleable>
             <br></br>
             <h2>blogs</h2>
-            {blogs.sort((a, b) => a.likes - b.likes).map(blog =>
-                <Blog
+            {blogs.sort((a, b) => a.likes - b.likes)
+                .map(blog => <Blog
                     key={blog.id}
                     blog={blog}
                     likeBlog={likeBlog}
                     removeBlog={removeBlog}
                     user={user}
-                />
-            )}
+                />)
+            }
         </div> : <LoginForm
             username={username}
             password={password}
