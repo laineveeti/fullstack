@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Routes, Route, useMatch } from 'react-router-dom';
+import { Link, Routes, Route, useMatch, Navigate } from 'react-router-dom';
 
 const Menu = () => {
     const padding = {
@@ -48,6 +48,12 @@ const About = () => (
     </div>
 );
 
+const Notification = ({ notification }) => (
+    <div>
+        {notification}
+    </div>
+);
+
 const Footer = () => (
     <div>
     Anecdote app for <a href='https://fullstackopen.com/'>Full Stack Open</a>.
@@ -60,7 +66,7 @@ const CreateNew = (props) => {
     const [content, setContent] = useState('');
     const [author, setAuthor] = useState('');
     const [info, setInfo] = useState('');
-
+    const [created, setCreated] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -70,7 +76,10 @@ const CreateNew = (props) => {
             info,
             votes: 0
         });
+        setCreated(true);
     };
+
+    if (created) return <Navigate replace to='/' />;
 
     return (
         <div>
@@ -115,9 +124,17 @@ const App = () => {
 
     const [notification, setNotification] = useState('');
 
+    const timedNotification = (content, time) => {
+        setNotification(content);
+        setTimeout(() => {
+            setNotification('');
+        }, 1000 * time);
+    };
+
     const addNew = (anecdote) => {
         anecdote.id = Math.round(Math.random() * 10000);
         setAnecdotes(anecdotes.concat(anecdote));
+        timedNotification(`a new anecdote ${anecdote.content} created!`, 5);
     };
 
     const anecdoteById = (id) => {
@@ -126,7 +143,7 @@ const App = () => {
         
     const match = useMatch('/anecdotes/:id');
     const anecdote = match
-        ? anecdoteById(match.params.id)
+        ? anecdoteById(Number(match.params.id))
         : null;
 
     const vote = (id) => {
@@ -144,6 +161,7 @@ const App = () => {
         <div>
             <h1>Software anecdotes</h1>
             <Menu />
+            <Notification notification={notification} />
             <Routes>
                 <Route path='/anecdotes/:id' element={<Anecdote anecdote={anecdote} />} />
                 <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
