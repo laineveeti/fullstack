@@ -1,29 +1,42 @@
 import { useState } from 'react';
 import { useField } from './hooks';
 import { Link, Routes, Route, useMatch, Navigate } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
+import { Alert, AppBar, Button, Container, IconButton, TextField, Toolbar } from '@mui/material';
 
 const Menu = () => {
-    const padding = {
-        paddingRight: 5
-    };
     return (
-        <div>
-            <Link to='/' style={padding}>anecdotes</Link>
-            <Link to='/create' style={padding}>create new</Link>
-            <Link to='/about' style={padding}>about</Link>
-        </div>
+        <AppBar position='static'>
+            <Toolbar>
+                <IconButton edge='start' color='inherit' aria-label='menu'></IconButton>
+                <Button color='inherit' component={Link} to='/'>
+                    anecdotes
+                </Button>
+                <Button color='inherit' component={Link} to='/create'>
+                    create new
+                </Button>
+                <Button color='inherit' component={Link} to='/about'>
+                    about
+                </Button>
+            </Toolbar>
+        </AppBar>
     );
 };
 
 const AnecdoteList = ({ anecdotes }) => (
     <div>
         <h2>Anecdotes</h2>
-        <ul>
-            {anecdotes.map(anecdote =>
-                <li key={anecdote.id} >
-                    <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
-                </li>)}
-        </ul>
+        <Table striped>
+            <tbody>
+                {anecdotes.map(anecdote =>
+                    <tr key={anecdote.id} >
+                        <td>
+                            <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+                        </td>
+                    </tr>
+                )}
+            </tbody>
+        </Table>
     </div>
 );
 
@@ -52,7 +65,11 @@ const About = () => (
 
 const Notification = ({ notification }) => (
     <div>
-        {notification}
+        {(notification &&
+            <Alert severity='success'>
+                {notification}
+            </Alert>
+        )}
     </div>
 );
 
@@ -92,19 +109,16 @@ const CreateNew = (props) => {
             <h2>create a new anecdote</h2>
             <form>
                 <div>
-                    content
-                    <input {...content} />
+                    <TextField label='content' {...content} />
                 </div>
                 <div>
-                    author
-                    <input {...author} />
+                    <TextField label='author' {...author} />
                 </div>
                 <div>
-                    url for more info
-                    <input {...info} />
+                    <TextField label='info' {...info} />
                 </div>
-                <button onClick={handleSubmit}>create</button>
-                <button onClick={resetAll}>reset</button>
+                <Button variant='contained' color='primary' onClick={handleSubmit}>create</Button>
+                <Button onClick={resetAll}>reset</Button>
             </form>
         </div>
     );
@@ -165,7 +179,7 @@ const App = () => {
     }; */
 
     return (
-        <div>
+        <Container>
             <h1>Software anecdotes</h1>
             <Menu />
             <Notification notification={notification} />
@@ -176,7 +190,7 @@ const App = () => {
                 <Route path='/create' element={<CreateNew addNew={addNew} />} />
             </Routes>
             <Footer />
-        </div>
+        </Container>
     );
 };
 
