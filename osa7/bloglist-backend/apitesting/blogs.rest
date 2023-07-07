@@ -1,0 +1,20 @@
+GET http://localhost:3001/api/blogs
+
+###
+POST http://localhost:3001/api/blogs
+Content-Type : application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWQiOiI2M2NhZmJjZmFlNTdmOWE1NGMxNGY2ZWUiLCJpYXQiOjE2NzQyNTQxODUsImV4cCI6MTY3NDI1Nzc4NX0.s_n4ZplhBS-lnbPUafmjEnedOtNDppi2CYxjpE1ZDxY
+
+{
+    "title": "testiblogi",
+    "author": "minävain",
+    "url": "localhost:3001",
+    "likes": 5
+}
+###
+PUT http://localhost:3001/api/blogs/63c6ca1fb0152ad35a59b7c9
+Content-Type: application/json
+
+{
+    "likes": 10
+}
