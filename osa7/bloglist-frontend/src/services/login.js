@@ -10,7 +10,6 @@ const login = async (credentials) => {
     } catch (exception) {
         serviceUtils.handleAxiosError(exception);
     }
-
 };
 
 export default login;
