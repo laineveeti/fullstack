@@ -1,28 +1,42 @@
 import { useState } from 'react';
+import { useField } from './hooks';
 import { Link, Routes, Route, useMatch, Navigate } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
+import { Alert, AppBar, Button, Container, IconButton, TextField, Toolbar } from '@mui/material';
 
 const Menu = () => {
-    const padding = {
-        paddingRight: 5
-    };
     return (
-        <div>
-            <Link to='/' style={padding}>anecdotes</Link>
-            <Link to='/create' style={padding}>create new</Link>
-            <Link to='/about' style={padding}>about</Link>
-        </div>
+        <AppBar position='static'>
+            <Toolbar>
+                <IconButton edge='start' color='inherit' aria-label='menu'></IconButton>
+                <Button color='inherit' component={Link} to='/'>
+                    anecdotes
+                </Button>
+                <Button color='inherit' component={Link} to='/create'>
+                    create new
+                </Button>
+                <Button color='inherit' component={Link} to='/about'>
+                    about
+                </Button>
+            </Toolbar>
+        </AppBar>
     );
 };
 
 const AnecdoteList = ({ anecdotes }) => (
     <div>
         <h2>Anecdotes</h2>
-        <ul>
-            {anecdotes.map(anecdote =>
-                <li key={anecdote.id} >
-                    <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
-                </li>)}
-        </ul>
+        <Table striped>
+            <tbody>
+                {anecdotes.map(anecdote =>
+                    <tr key={anecdote.id} >
+                        <td>
+                            <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+                        </td>
+                    </tr>
+                )}
+            </tbody>
+        </Table>
     </div>
 );
 
@@ -30,9 +44,10 @@ const Anecdote = ({ anecdote }) => (
     <div>
         <h2>{anecdote.content}</h2>
         has {anecdote.votes} votes
+        <br></br>
         for more info see <a href={anecdote.info}>{anecdote.info}</a>
     </div>
-)
+);
 
 const About = () => (
     <div>
@@ -42,7 +57,7 @@ const About = () => (
         <em>An anecdote is a brief, revealing account of an individual person or an incident.
       Occasionally humorous, anecdotes differ from jokes because their primary purpose is not simply to provoke laughter but to reveal a truth more general than the brief tale itself,
       such as to characterize a person by delineating a specific quirk or trait, to communicate an abstract idea about a person, place, or thing through the concrete details of a short narrative.
-      An anecdote is "a story with a point."</em>
+      An anecdote is &quot;a story with a point.&quot;</em>
 
         <p>Software engineering is full of excellent anecdotes, at this app you can find the best and add more.</p>
     </div>
@@ -50,7 +65,11 @@ const About = () => (
 
 const Notification = ({ notification }) => (
     <div>
-        {notification}
+        {(notification &&
+            <Alert severity='success'>
+                {notification}
+            </Alert>
+        )}
     </div>
 );
 
@@ -63,20 +82,24 @@ const Footer = () => (
 );
 
 const CreateNew = (props) => {
-    const [content, setContent] = useState('');
-    const [author, setAuthor] = useState('');
-    const [info, setInfo] = useState('');
+    const { reset: contentReset, ...content } = useField('text');
+    const { reset: authorReset, ...author } = useField('text');
+    const { reset: infoReset, ...info } = useField('text');
     const [created, setCreated] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         props.addNew({
-            content,
-            author,
-            info,
+            content: content.value,
+            author: author.value,
+            info: info.value,
             votes: 0
         });
         setCreated(true);
+    };
+
+    const resetAll = () => {
+        [contentReset, authorReset, infoReset].forEach(f => f());
     };
 
     if (created) return <Navigate replace to='/' />;
@@ -84,20 +107,18 @@ const CreateNew = (props) => {
     return (
         <div>
             <h2>create a new anecdote</h2>
-            <form onSubmit={handleSubmit}>
+            <form>
                 <div>
-          content
-                    <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+                    <TextField label='content' {...content} />
                 </div>
                 <div>
-          author
-                    <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+                    <TextField label='author' {...author} />
                 </div>
                 <div>
-          url for more info
-                    <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
+                    <TextField label='info' {...info} />
                 </div>
-                <button>create</button>
+                <Button variant='contained' color='primary' onClick={handleSubmit}>create</Button>
+                <Button onClick={resetAll}>reset</Button>
             </form>
         </div>
     );
@@ -140,13 +161,13 @@ const App = () => {
     const anecdoteById = (id) => {
         return anecdotes.find(a => a.id === id);
     };
-        
+
     const match = useMatch('/anecdotes/:id');
     const anecdote = match
         ? anecdoteById(Number(match.params.id))
         : null;
 
-    const vote = (id) => {
+    /*     const vote = (id) => {
         const anecdote = anecdoteById(id);
 
         const voted = {
@@ -155,10 +176,10 @@ const App = () => {
         };
 
         setAnecdotes(anecdotes.map(a => a.id === id ? voted : a));
-    };
+    }; */
 
     return (
-        <div>
+        <Container>
             <h1>Software anecdotes</h1>
             <Menu />
             <Notification notification={notification} />
@@ -169,7 +190,7 @@ const App = () => {
                 <Route path='/create' element={<CreateNew addNew={addNew} />} />
             </Routes>
             <Footer />
-        </div>
+        </Container>
     );
 };
 
