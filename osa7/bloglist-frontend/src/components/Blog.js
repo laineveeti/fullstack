@@ -1,10 +1,17 @@
 import { useDispatch } from 'react-redux';
 import { likeBlogAsync, removeBlogAsync } from '../reducers/blogReducer';
-import Toggleable from './Toggleable';
 import { displayErrorNotification } from '../reducers/notificationReducer';
 import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
-const Blog = ({ blog }) => {
+const Blog = ({ id }) => {
+    const blog = useSelector(state => state.blogs.find(b => b.id === id));
+
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+
+    if(!blog) return <Navigate replace to='/' />;
+
     const blogStyle = {
         paddingTop: 10,
         paddingLeft: 2,
@@ -13,8 +20,6 @@ const Blog = ({ blog }) => {
         marginBottom: 5,
     };
 
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.user);
 
     const handleLike = async () => {
         try {
@@ -35,19 +40,17 @@ const Blog = ({ blog }) => {
 
     return (
         <div className='blog' style={blogStyle}>
-            {blog.title} {blog.author}
-            <Toggleable showLabel='view' hideLabel='hide' key={blog.id}>
-                {blog.url}
-                <br></br>
-                likes: {blog.likes}
-                <button onClick={handleLike}>like</button>
-                <br></br>
-                {blog.user.username}
-                <br></br>
-                {user && blog.user.id === user.id ? (
-                    <button onClick={handleRemove}>remove</button>
-                ) : null}
-            </Toggleable>
+            <h1>{blog.title} {blog.author}</h1>
+            <a href={blog.url}>{blog.url}</a>
+            <br></br>
+            {blog.likes} likes
+            <button onClick={handleLike}>like</button>
+            <br></br>
+            added by {blog.user.username}
+            <br></br>
+            {user && blog.user.id === user.id ? (
+                <button onClick={handleRemove}>remove</button>
+            ) : null}
         </div>
     );
 };

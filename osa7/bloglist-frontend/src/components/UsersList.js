@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 
 const UsersList = () => {
     const users = useSelector(state => state.users);
-    console.log(users);
 
     return <div>
         <h1>Users</h1>
@@ -19,7 +18,7 @@ const UsersList = () => {
                 {[...users].map(user => {
                     return <TableRow key={user.id}>
                         <TableCell>
-                            <Link to={`users/${user.id}`}>{user.username}</Link>
+                            <Link to={`${user.id}`}>{user.username}</Link>
                         </TableCell>
                         <TableCell>{user.blogs.length}</TableCell>
                     </TableRow>;

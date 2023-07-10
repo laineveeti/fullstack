@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import Toggleable from './Toggleable';
 import CreateForm from './CreateForm';
-import Blog from './Blog';
+import { Link } from 'react-router-dom';
 
 const BlogList = () => {
     const blogs = useSelector((state) => state.blogs);
@@ -14,11 +14,16 @@ const BlogList = () => {
             </Toggleable>
             <br></br>
             <h2>blogs</h2>
-            {[...blogs]
-                .sort((a, b) => b.likes - a.likes)
-                .map((blog) => (
-                    <Blog key={blog.id} blog={blog} />
-                ))}
+            <ul>
+                {[...blogs]
+                    .sort((a, b) => b.likes - a.likes)
+                    .map((blog) => (
+                        <li key={blog.id}>
+                            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+                        </li>
+                    ))
+                }
+            </ul>
         </div>
     );
 };
