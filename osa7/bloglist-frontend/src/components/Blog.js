@@ -5,12 +5,12 @@ import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 
 const Blog = ({ id }) => {
-    const blog = useSelector(state => state.blogs.find(b => b.id === id));
+    const blog = useSelector((state) => state.blogs.find((b) => b.id === id));
 
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
 
-    if(!blog) return <Navigate replace to='/' />;
+    if (!blog) return <Navigate replace to='/' />;
 
     const blogStyle = {
         paddingTop: 10,
@@ -19,7 +19,6 @@ const Blog = ({ id }) => {
         borderWidth: 2,
         marginBottom: 5,
     };
-
 
     const handleLike = async () => {
         try {
@@ -40,7 +39,9 @@ const Blog = ({ id }) => {
 
     return (
         <div className='blog' style={blogStyle}>
-            <h1>{blog.title} {blog.author}</h1>
+            <h1>
+                {blog.title} {blog.author}
+            </h1>
             <a href={blog.url}>{blog.url}</a>
             <br></br>
             {blog.likes} likes
@@ -51,6 +52,12 @@ const Blog = ({ id }) => {
             {user && blog.user.id === user.id ? (
                 <button onClick={handleRemove}>remove</button>
             ) : null}
+            <h2>comments</h2>
+            <ul>
+                {[...blog.comments].map((c, i) => (
+                    <li key={`comment-${i}`}>{c}</li>
+                ))}
+            </ul>
         </div>
     );
 };

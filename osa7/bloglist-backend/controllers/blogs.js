@@ -3,13 +3,17 @@ const Blog = require('../models/blog');
 const { userExtractor } = require('../utils/middleware');
 
 blogsRouter.get('', async (request, response) => {
-    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1, id: 1 });
+    const blogs = await Blog.find({}).populate('user', {
+        username: 1,
+        name: 1,
+        id: 1,
+    });
     response.json(blogs);
 });
 
 blogsRouter.get('/:id', async (request, response) => {
     const blog = await Blog.findById(request.params.id);
-    if(!blog) {
+    if (!blog) {
         const invalidIdError = new Error('blog with id does not exist!');
         invalidIdError.name = 'invalidIdError';
         throw invalidIdError;
@@ -34,13 +38,15 @@ blogsRouter.post('', userExtractor, async (request, response) => {
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
     const blog = await Blog.findById(request.params.id);
 
-    if(!blog) {
+    if (!blog) {
         const invalidIdError = new Error('blog with id does not exist!');
         invalidIdError.name = 'invalidIdError';
         throw invalidIdError;
     }
-    if(request.user._id.toString() !== blog.user.toString()) {
-        return response.status(401).json({ error: 'user does not have access to this blog' });
+    if (request.user._id.toString() !== blog.user.toString()) {
+        return response
+            .status(401)
+            .json({ error: 'user does not have access to this blog' });
     }
 
     await blog.delete();
@@ -49,7 +55,7 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response) => {
     const blog = await Blog.findById(request.params.id);
-    if(!blog) {
+    if (!blog) {
         const invalidIdError = new Error('blog with id does not exist!');
         invalidIdError.name = 'invalidIdError';
         throw invalidIdError;
@@ -60,6 +66,18 @@ blogsRouter.put('/:id', async (request, response) => {
         { new: true, runValidators: true, context: 'query' }
     );
     response.json(updatedBlog);
+});
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+    const blog = await Blog.findById(request.params.id);
+    if (!blog) {
+        const invalidIdError = new Error('blog with id does not exist!');
+        invalidIdError.name = 'invalidIdError';
+        throw invalidIdError;
+    }
+    blog.comments = [...blog.comments, request.body.content];
+    const savedBlog = await blog.save();
+    response.json(savedBlog);
 });
 
 module.exports = blogsRouter;

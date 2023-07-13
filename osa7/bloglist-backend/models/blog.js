@@ -4,18 +4,19 @@ const blogSchema = mongoose.Schema(
     {
         title: {
             type: String,
-            required: true
+            required: true,
         },
         author: String,
         url: {
             type: String,
-            required: true
+            required: true,
         },
         likes: Number,
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }
+            ref: 'User',
+        },
+        comments: [String],
     },
     {
         toJSON: {
@@ -23,8 +24,8 @@ const blogSchema = mongoose.Schema(
                 result.id = result._id.toString();
                 delete result._id;
                 delete result.__v;
-            }
-        }
+            },
+        },
     }
 );
 
