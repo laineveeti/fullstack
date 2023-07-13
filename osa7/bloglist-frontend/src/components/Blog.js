@@ -1,8 +1,14 @@
 import { useDispatch } from 'react-redux';
-import { likeBlogAsync, removeBlogAsync } from '../reducers/blogReducer';
+import {
+    likeBlogAsync,
+    removeBlogAsync,
+    addCommentAsync,
+} from '../reducers/blogReducer';
 import { displayErrorNotification } from '../reducers/notificationReducer';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
+import { useField } from '../hooks';
+import { Button, Input } from '@mui/material';
 
 const Blog = ({ id }) => {
     const blog = useSelector((state) => state.blogs.find((b) => b.id === id));
@@ -37,6 +43,27 @@ const Blog = ({ id }) => {
         }
     };
 
+    const CommentForm = () => {
+        // eslint-disable-next-line no-unused-vars
+        const { reset, ...comment } = useField('text');
+
+        const handleComment = async (event) => {
+            event.preventDefault();
+            try {
+                dispatch(addCommentAsync(blog.id, comment.value));
+            } catch (exception) {
+                displayErrorNotification(dispatch, exception);
+            }
+        };
+
+        return (
+            <form onSubmit={handleComment}>
+                <Input {...comment}></Input>
+                <Button type='submit'>add comment</Button>
+            </form>
+        );
+    };
+
     return (
         <div className='blog' style={blogStyle}>
             <h1>
@@ -53,6 +80,7 @@ const Blog = ({ id }) => {
                 <button onClick={handleRemove}>remove</button>
             ) : null}
             <h2>comments</h2>
+            <CommentForm />
             <ul>
                 {[...blog.comments].map((c, i) => (
                     <li key={`comment-${i}`}>{c}</li>
