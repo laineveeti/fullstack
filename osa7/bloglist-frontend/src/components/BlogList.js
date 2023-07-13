@@ -1,30 +1,39 @@
 import { useSelector } from 'react-redux';
-import Toggleable from './Toggleable';
-import CreateForm from './CreateForm';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import Button from '@mui/material/IconButton';
+import ListItemText from '@mui/material/ListItemText';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 import { Link } from 'react-router-dom';
+import ContentList from './ContentList';
 
 const BlogList = () => {
     const blogs = useSelector((state) => state.blogs);
 
     return (
-        <div>
-            <h2>create new</h2>
-            <Toggleable showLabel='create new blog' hideLabel='cancel'>
-                <CreateForm />
-            </Toggleable>
-            <br></br>
-            <h2>blogs</h2>
-            <ul>
-                {[...blogs]
-                    .sort((a, b) => b.likes - a.likes)
-                    .map((blog) => (
-                        <li key={blog.id}>
-                            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-                        </li>
-                    ))
-                }
-            </ul>
-        </div>
+        <ContentList
+            header={
+                <div>
+                    blogs
+                    <Button component={Link} to='/create'>
+                        <AddBoxIcon />
+                    </Button>
+                </div>
+            }
+        >
+            {[...blogs]
+                .sort((a, b) => b.likes - a.likes)
+                .map((blog) => (
+                    <ListItem key={blog.id} disablePadding>
+                        <ListItemButton
+                            component={Link}
+                            to={`/blogs/${blog.id}`}
+                        >
+                            <ListItemText primary={blog.title} />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+        </ContentList>
     );
 };
 

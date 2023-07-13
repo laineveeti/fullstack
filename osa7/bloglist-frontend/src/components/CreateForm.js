@@ -5,13 +5,18 @@ import {
 } from '../reducers/notificationReducer';
 import { useDispatch } from 'react-redux';
 import { useField } from '../hooks/index';
+import { Navigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const CreateForm = () => {
     const { reset: titleReset, ...title } = useField('text');
     const { reset: authorReset, ...author } = useField('text');
     const { reset: urlReset, ...url } = useField('text');
+    const [created, setCreated] = useState(null);
 
     const dispatch = useDispatch();
+
+    if (created) return <Navigate to={`/blogs/${created.id}`} replace />;
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -28,6 +33,7 @@ const CreateForm = () => {
                 `a new blog ${newBlog.title} by ${newBlog.author} added`,
                 'green'
             );
+            setCreated(newBlog);
         } catch (exception) {
             displayErrorNotification(dispatch, exception);
         }

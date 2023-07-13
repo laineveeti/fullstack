@@ -1,4 +1,17 @@
 import { useDispatch } from 'react-redux';
+import * as React from 'react';
+import { styled } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import {
     likeBlogAsync,
     removeBlogAsync,
@@ -15,16 +28,6 @@ const Blog = ({ id }) => {
 
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
-
-    if (!blog) return <Navigate replace to='/' />;
-
-    const blogStyle = {
-        paddingTop: 10,
-        paddingLeft: 2,
-        border: 'solid',
-        borderWidth: 2,
-        marginBottom: 5,
-    };
 
     const handleLike = async () => {
         try {
@@ -64,29 +67,64 @@ const Blog = ({ id }) => {
         );
     };
 
+    const ExpandMore = styled((props) => {
+        // eslint-disable-next-line no-unused-vars
+        return <IconButton {...props} />;
+    })(({ theme }) => ({
+        transform: !expanded ? 'rotate(0deg)' : 'rotate(180deg)',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    }));
+
+    const [expanded, setExpanded] = React.useState(false);
+
+    const handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
+    if (!blog) return <Navigate replace to='/' />;
+
     return (
-        <div className='blog' style={blogStyle}>
-            <h1>
-                {blog.title} {blog.author}
-            </h1>
-            <a href={blog.url}>{blog.url}</a>
-            <br></br>
-            {blog.likes} likes
-            <button onClick={handleLike}>like</button>
-            <br></br>
-            added by {blog.user.username}
-            <br></br>
-            {user && blog.user.id === user.id ? (
-                <button onClick={handleRemove}>remove</button>
-            ) : null}
-            <h2>comments</h2>
-            <CommentForm />
-            <ul>
-                {[...blog.comments].map((c, i) => (
-                    <li key={`comment-${i}`}>{c}</li>
-                ))}
-            </ul>
-        </div>
+        <Card className='blog'>
+            <CardHeader title={blog.title} subheader={blog.author} />
+            <CardContent>
+                <Typography variant='body2' color='text.secondary'>
+                    <a href={blog.url}>{blog.url}</a>
+                    <br></br>
+                    added by {blog.user.username}
+                </Typography>
+            </CardContent>
+            <CardActions disableSpacing>
+                {blog.likes} likes
+                <IconButton onClick={handleLike} aria-label='like'>
+                    <FavoriteIcon />
+                </IconButton>
+                {user && blog.user.id === user.id ? (
+                    <IconButton onClick={handleRemove}>
+                        <DeleteIcon />
+                    </IconButton>
+                ) : null}
+                comments
+                <ExpandMore
+                    onClick={handleExpandClick}
+                    aria-expanded={expanded}
+                    aria-label='show comments'
+                >
+                    <ExpandMoreIcon />
+                </ExpandMore>
+            </CardActions>
+            <Collapse in={expanded} timeout='auto' unmountOnExit>
+                <CardContent>
+                    <CommentForm />
+                    <ul>
+                        {[...blog.comments].map((c, i) => (
+                            <li key={`comment-${i}`}>{c}</li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Collapse>
+        </Card>
     );
 };
 

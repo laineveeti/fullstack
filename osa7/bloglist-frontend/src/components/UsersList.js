@@ -1,31 +1,34 @@
-import { Table, TableCell, TableHead, TableRow, TableBody } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import ContentList from './ContentList';
+import { Stack } from '@mui/material';
 
 const UsersList = () => {
-    const users = useSelector(state => state.users);
+    const users = useSelector((state) => state.users);
 
-    return <div>
-        <h1>Users</h1>
-        <Table>
-            <TableHead>
-                <TableRow>
-                    <TableCell></TableCell>
-                    <TableCell>blogs created</TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {[...users].map(user => {
-                    return <TableRow key={user.id}>
-                        <TableCell>
-                            <Link to={`${user.id}`}>{user.username}</Link>
-                        </TableCell>
-                        <TableCell>{user.blogs.length}</TableCell>
-                    </TableRow>;
-                })}
-            </TableBody>
-        </Table>
-    </div>;
+    return (
+        <ContentList header='users'>
+            {[...users].map((user) => (
+                <ListItem key={user.id} disablePadding>
+                    <ListItemButton
+                        component={Link}
+                        to={`/users/${user.id}`}
+                        style={{ display: 'flex' }}
+                    >
+                        <Stack direction='row' justifyContent='space-between'>
+                            <ListItemText primary={user.name} />
+                            <ListItemText
+                                secondary={user.blogs.length + ' blogs'}
+                            />
+                        </Stack>
+                    </ListItemButton>
+                </ListItem>
+            ))}
+        </ContentList>
+    );
 };
 
 export default UsersList;
