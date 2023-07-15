@@ -86,7 +86,7 @@ const Blog = ({ id }) => {
     if (!blog) return <Navigate replace to='/' />;
 
     return (
-        <Card className='blog'>
+        <Card>
             <CardHeader title={blog.title} subheader={blog.author} />
             <CardContent>
                 <Typography variant='body2' color='text.secondary'>

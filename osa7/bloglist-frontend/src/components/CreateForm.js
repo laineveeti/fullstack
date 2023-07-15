@@ -3,7 +3,7 @@ import {
     displayNotification,
     displayErrorNotification,
 } from '../reducers/notificationReducer';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useField } from '../hooks/index';
 import { Navigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -15,8 +15,10 @@ const CreateForm = () => {
     const [created, setCreated] = useState(null);
 
     const dispatch = useDispatch();
+    const user = useSelector(state => state.user);
 
     if (created) return <Navigate to={`/blogs/${created.id}`} replace />;
+    if (!user) return <Navigate to={'/login'} replace />;
 
     const handleSubmit = async (event) => {
         event.preventDefault();

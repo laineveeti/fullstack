@@ -1,23 +1,20 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
-import { useField } from '../hooks';
 import { loginAsync } from '../reducers/userReducer';
 import { displayErrorNotification } from '../reducers/notificationReducer';
 import { Navigate } from 'react-router-dom';
+import { TextField, Container, Box, Typography, Button } from '@mui/material/';
 
 const LoginForm = () => {
     const dispatch = useDispatch();
 
-    // eslint-disable-next-line no-unused-vars
-    const { reset, ...username } = useField('text');
-    const [password, setPassword] = useState('');
-    const user = useSelector((state) => state.user);
+    const user = useSelector(state => state.user);
 
-    const handleLogin = async (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const credentials = { username: username.value, password: password };
+        const form = new FormData(event.currentTarget);
+        const credentials = { username: form.get('username'), password: form.get('password') };
         try {
-            dispatch(loginAsync(credentials));
+            await dispatch(loginAsync(credentials));
         } catch (exception) {
             displayErrorNotification(dispatch, exception);
         }
@@ -26,7 +23,54 @@ const LoginForm = () => {
     if (user) return <Navigate replace to='/' />;
 
     return (
-        <div>
+        <Container component="main" maxWidth="xs">
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography component="h1" variant="h5">
+                    Sign in
+                </Typography>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="username"
+                        label="Username"
+                        name="username"
+                        autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Sign in
+                    </Button>
+                </Box>
+            </Box>
+        </Container>
+    );
+};
+
+export default LoginForm;
+
+/*         <div>
             <h2>Login</h2>
             <form onSubmit={handleLogin}>
                 <div>
@@ -44,8 +88,4 @@ const LoginForm = () => {
                 </div>
                 <button type='submit'>login</button>
             </form>
-        </div>
-    );
-};
-
-export default LoginForm;
+        </div> */

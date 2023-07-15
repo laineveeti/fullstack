@@ -1,33 +1,37 @@
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import ContentList from './ContentList';
-import { Stack } from '@mui/material';
+import { Grid, Stack, Typography } from '@mui/material';
 
 const UsersList = () => {
     const users = useSelector((state) => state.users);
 
     return (
-        <ContentList header='users'>
-            {[...users].map((user) => (
-                <ListItem key={user.id} disablePadding>
-                    <ListItemButton
-                        component={Link}
-                        to={`/users/${user.id}`}
-                        style={{ display: 'flex' }}
-                    >
-                        <Stack direction='row' justifyContent='space-between'>
-                            <ListItemText primary={user.name} />
-                            <ListItemText
-                                secondary={user.blogs.length + ' blogs'}
-                            />
-                        </Stack>
-                    </ListItemButton>
-                </ListItem>
-            ))}
-        </ContentList>
+        <Grid container spacing={3}>
+            <Grid item xs={4}>
+                <ContentList header='users'>
+                    {[...users].map((user) => (
+                        <ListItem key={user.id} disablePadding>
+                            <ListItemButton
+                                component={Link}
+                                to={`/users/${user.id}`}
+                                style={{ display: 'flex' }}
+                            >
+                                <Stack direction='row' justifyContent='space-between' spacing={3} style={{ width: '100%' }}>
+                                    <Typography>{user.name}</Typography>
+                                    <Typography>{user.blogs.length} blogs</Typography>
+                                </Stack>
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </ContentList>
+            </Grid>
+            <Grid item xs>
+                <Outlet />
+            </Grid>
+        </Grid>
     );
 };
 
