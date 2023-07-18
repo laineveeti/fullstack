@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries';
 import { useMutation } from '@apollo/client';
+import { NotificationContext } from '../NotificationContext';
 
 const NewBook = () => {
     const [title, setTitle] = useState('');
@@ -8,6 +9,7 @@ const NewBook = () => {
     const [published, setPublished] = useState('');
     const [genre, setGenre] = useState('');
     const [genres, setGenres] = useState([]);
+    const [notification, setNotification] = useContext(NotificationContext);
 
     const [addBook] = useMutation(ADD_BOOK, {
         refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
@@ -17,7 +19,7 @@ const NewBook = () => {
             const messages = Object.values(errors)
                 .map((e) => e.message)
                 .join('\n');
-            console.log(messages);
+            setNotification(messages);
         },
     });
 
