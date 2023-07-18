@@ -166,7 +166,7 @@ const resolvers = {
                 id: user._id,
             };
             return {
-                value: `Bearer ${jwt.sign(userForToken, process.env.SECRET)}`,
+                value: jwt.sign(userForToken, process.env.SECRET),
             };
         },
     },
