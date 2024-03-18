@@ -9,17 +9,15 @@ const NewBook = () => {
     const [published, setPublished] = useState('');
     const [genre, setGenre] = useState('');
     const [genres, setGenres] = useState([]);
-    const [notification, setNotification] = useContext(NotificationContext);
+    const [, setError] = useContext(NotificationContext);
 
     const [addBook] = useMutation(ADD_BOOK, {
         refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
         onError: (error) => {
-            console.log(error);
-            const errors = error.graphQLErrors[0].extensions.error.errors;
-            const messages = Object.values(errors)
+            const messages = error.graphQLErrors
                 .map((e) => e.message)
                 .join('\n');
-            setNotification(messages);
+            setError(messages);
         },
     });
 
@@ -67,7 +65,7 @@ const NewBook = () => {
                 <div>
                     published
                     <input
-                        type="number"
+                        type='number'
                         value={published}
                         onChange={({ target }) => setPublished(target.value)}
                     />
@@ -77,12 +75,12 @@ const NewBook = () => {
                         value={genre}
                         onChange={({ target }) => setGenre(target.value)}
                     />
-                    <button onClick={addGenre} type="button">
+                    <button onClick={addGenre} type='button'>
                         add genre
                     </button>
                 </div>
                 <div>genres: {genres.join(' ')}</div>
-                <button type="submit">create book</button>
+                <button type='submit'>create book</button>
             </form>
         </div>
     );

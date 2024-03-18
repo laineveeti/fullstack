@@ -1,21 +1,27 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useMutation } from '@apollo/client';
 import { EDIT_AUTHOR, ALL_AUTHORS } from '../queries';
+import { NotificationContext } from '../NotificationContext';
 
 const BirthyearForm = ({ authorsQuery }) => {
+    const [, setError] = useContext(NotificationContext);
+
     const [editAuthor] = useMutation(EDIT_AUTHOR, {
         refetchQueries: [{ query: ALL_AUTHORS }],
+        onError: (error) => {
+            const messages = error.graphQLErrors
+                .map((e) => e.message)
+                .join('\n');
+            setError(messages);
+        },
     });
+
     const [name, setName] = useState('');
     const [born, setBorn] = useState('');
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
-        console.log(name);
-
         editAuthor({ variables: { name: name, born: Number(born) } });
-
         setName('');
         setBorn('');
     };
@@ -46,7 +52,7 @@ const BirthyearForm = ({ authorsQuery }) => {
                     value={born}
                 />
                 <br></br>
-                <button type="submit">update author</button>
+                <button type='submit'>update author</button>
             </form>
         </div>
     );

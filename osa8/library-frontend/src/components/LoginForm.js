@@ -1,31 +1,21 @@
-import { useState, useContext, useEffect } from 'react';
-import { LOGIN } from '../queries';
-import { useMutation } from '@apollo/client';
-import { NotificationContext } from '../NotificationContext';
+import { useState, useContext } from 'react';
+import { LoginContext } from '../LoginContext';
+import { Navigate } from 'react-router';
 
-const LoginForm = ({ setToken }) => {
+const LoginForm = () => {
     const [username, setName] = useState('');
     const [password, setPassword] = useState('');
-    const [setNotification] = useContext(NotificationContext);
-    const [login, result] = useMutation(LOGIN, {
-        onError: (error) => {
-            setNotification(error.GraphQLErrors[0].message);
-        },
-    });
+
+    const { userQuery, loginMutation } = useContext(LoginContext);
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        login({ variables: { username, password } });
+        loginMutation({ variables: { username, password } });
     };
 
-    useEffect(() => {
-        if (result.data) {
-            setToken(result.data.login.value);
-            localStorage.setItem('library-user-token', result.data.login.value);
-        }
-    }, [result.data]);
-
-    return (
+    return userQuery.data.me ? (
+        <Navigate to='/' />
+    ) : (
         <form onSubmit={handleSubmit}>
             username
             <input
@@ -36,10 +26,10 @@ const LoginForm = ({ setToken }) => {
             password
             <input
                 value={password}
-                type="password"
+                type='password'
                 onChange={({ target }) => setPassword(target.value)}
             />
-            <button type="submit">login</button>
+            <button type='submit'>login</button>
         </form>
     );
 };

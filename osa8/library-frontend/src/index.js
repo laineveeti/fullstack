@@ -10,6 +10,7 @@ import {
 import { BrowserRouter } from 'react-router-dom';
 import { setContext } from '@apollo/client/link/context';
 import NotificationContextProvider from './NotificationContextProvider';
+import LoginContextProvider from './LoginContextProvider';
 
 const authLink = setContext((_, { headers }) => {
     const token = localStorage.getItem('library-user-token');
@@ -34,9 +35,11 @@ const client = new ApolloClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
     <ApolloProvider client={client}>
         <NotificationContextProvider>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
+            <LoginContextProvider>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </LoginContextProvider>
         </NotificationContextProvider>
     </ApolloProvider>
 );
