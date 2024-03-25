@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries';
+import { ADD_BOOK, ALL_BOOKS, GENRE_BOOKS, ALL_AUTHORS } from '../queries';
 import { useMutation } from '@apollo/client';
 import { NotificationContext } from '../NotificationContext';
 
@@ -12,10 +12,14 @@ const NewBook = () => {
     const [, setError] = useContext(NotificationContext);
 
     const [addBook] = useMutation(ADD_BOOK, {
-        refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+        refetchQueries: [
+            { query: ALL_BOOKS },
+            { query: GENRE_BOOKS },
+            { query: ALL_AUTHORS },
+        ],
         onError: (error) => {
             const messages = error.graphQLErrors
-                .map((e) => e.message)
+                .map((e) => `${e.message} : ${e.extensions.error.message}`)
                 .join('\n');
             setError(messages);
         },

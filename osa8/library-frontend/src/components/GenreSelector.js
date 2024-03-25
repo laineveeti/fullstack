@@ -1,4 +1,14 @@
-const GenreSelector = ({ genres, setGenre }) => {
+const GenreSelector = ({ books, setGenre }) => {
+    const genres = books.reduce((acc, book) => {
+        let newGenres = acc;
+        book.genres.forEach((genre) => {
+            if (!newGenres.includes(genre)) {
+                newGenres = newGenres.concat(genre);
+            }
+        });
+        return newGenres;
+    }, []);
+
     return (
         <div>
             {genres.map((genre) => (
