@@ -20,6 +20,10 @@ const typeDefs = `
     ): Token
   }
 
+  type Subscription {
+    bookAdded: Book!
+  }
+
   type Author {
     name: String!
     born: Int
