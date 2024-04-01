@@ -25,6 +25,13 @@ const App = () => {
             const addedBook = data.data.bookAdded;
             notify(`Book '${addedBook.title}' added`);
             updateBookCache(client.cache, { query: ALL_BOOKS }, addedBook);
+            addedBook.genres.forEach((addedGenre) => {
+                updateBookCache(
+                    client.cache,
+                    { query: GENRE_BOOKS, variables: { genre: addedGenre } },
+                    addedBook
+                );
+            });
         },
     });
 
@@ -40,7 +47,7 @@ const App = () => {
             <Notification />
             <Routes>
                 <Route
-                    path="/authors"
+                    path='/authors'
                     element={
                         <Authors authorsQuery={authorsQuery}>
                             {userQuery ? (
@@ -52,11 +59,11 @@ const App = () => {
                     }
                 />
                 <Route
-                    path="/books"
+                    path='/books'
                     element={<BooksByGenre booksQuery={booksQuery} />}
                 />
                 <Route
-                    path="/recommended"
+                    path='/recommended'
                     element={
                         currentUser ? (
                             <Recommended />
@@ -69,7 +76,7 @@ const App = () => {
                     }
                 />
                 <Route
-                    path="/create"
+                    path='/create'
                     element={
                         currentUser ? (
                             <NewBook />
@@ -82,16 +89,16 @@ const App = () => {
                     }
                 />
                 <Route
-                    path="/login"
+                    path='/login'
                     element={
                         !currentUser ? (
                             <LoginForm />
                         ) : (
-                            <Navigate to="/books" replace />
+                            <Navigate to='/books' replace />
                         )
                     }
                 />
-                <Route path="*" element={<Navigate to="/books" replace />} />
+                <Route path='*' element={<Navigate to='/books' replace />} />
             </Routes>
         </div>
     );

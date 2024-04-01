@@ -7,10 +7,13 @@ export const updateBookCache = (cache, query, addedBook) => {
         });
     };
 
-    cache.updateQuery(query, ({ allBooks }) => {
-        console.log(query);
-        return {
-            allBooks: uniqueByName(allBooks.concat(addedBook)),
-        };
-    });
+    const readData = cache.readQuery(query);
+    if (readData) {
+        cache.writeQuery({
+            ...query,
+            data: {
+                allBooks: uniqueByName(readData.allBooks.concat(addedBook)),
+            },
+        });
+    }
 };
