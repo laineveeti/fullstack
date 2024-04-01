@@ -8,7 +8,20 @@ const BooksByGenre = ({ booksQuery }) => {
     const [genre, setGenre] = useState('');
     const genreQuery = useQuery(GENRE_BOOKS, { variables: { genre } });
 
-    if (booksQuery.loading || genre & genreQuery.loading)
+    useSubscription(BOOK_ADDED, {
+        onData: ({ data, client }) => {
+            const addedBook = data.data.bookAdded;
+            if(addedBook.genres.contains(genre)) {
+                updateBookCache(
+                    client.cache,
+                    { query: GENRE_BOOKS, variables: { genre } },
+                    addedBook
+                )
+            }
+        },
+    });
+
+    if (booksQuery.loading || (genre && genreQuery.loading))
         return <div>loading...</div>;
     const books = booksQuery.data.allBooks;
     const genreBooks = genreQuery.data && genreQuery.data.allBooks;
@@ -24,7 +37,7 @@ const BooksByGenre = ({ booksQuery }) => {
                 <> all books </>
             )}
             <GenreSelector books={books} setGenre={setGenre} />
-            <Books books={genreBooks || books} />
+            <Books books={genre ? genreBooks : books} />
         </div>
     );
 };

@@ -1,7 +1,8 @@
 import { useState, useContext } from 'react';
-import { ADD_BOOK, ALL_BOOKS, GENRE_BOOKS, ALL_AUTHORS } from '../queries';
+import { ADD_BOOK, ALL_BOOKS } from '../queries';
 import { useMutation } from '@apollo/client';
 import { NotificationContext } from '../NotificationContext';
+import { updateBookCache } from '../utils/updateCache';
 
 const NewBook = () => {
     const [title, setTitle] = useState('');
@@ -9,19 +10,17 @@ const NewBook = () => {
     const [published, setPublished] = useState('');
     const [genre, setGenre] = useState('');
     const [genres, setGenres] = useState([]);
-    const [, setError] = useContext(NotificationContext);
+    const { notify } = useContext(NotificationContext);
 
     const [addBook] = useMutation(ADD_BOOK, {
-        refetchQueries: [
-            { query: ALL_BOOKS },
-            { query: GENRE_BOOKS },
-            { query: ALL_AUTHORS },
-        ],
         onError: (error) => {
             const messages = error.graphQLErrors
                 .map((e) => `${e.message} : ${e.extensions.error.message}`)
                 .join('\n');
-            setError(messages);
+            notify(messages);
+        },
+        update: (cache, response) => {
+            updateBookCache(cache, { query: ALL_BOOKS }, response.data.addBook);
         },
     });
 
@@ -69,7 +68,7 @@ const NewBook = () => {
                 <div>
                     published
                     <input
-                        type='number'
+                        type="number"
                         value={published}
                         onChange={({ target }) => setPublished(target.value)}
                     />
@@ -79,12 +78,12 @@ const NewBook = () => {
                         value={genre}
                         onChange={({ target }) => setGenre(target.value)}
                     />
-                    <button onClick={addGenre} type='button'>
+                    <button onClick={addGenre} type="button">
                         add genre
                     </button>
                 </div>
                 <div>genres: {genres.join(' ')}</div>
-                <button type='submit'>create book</button>
+                <button type="submit">create book</button>
             </form>
         </div>
     );

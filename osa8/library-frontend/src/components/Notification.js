@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { NotificationContext } from '../NotificationContext';
 
 const Notification = () => {
-    const [notification] = useContext(NotificationContext);
+    const { notification } = useContext(NotificationContext);
 
     const style = {
         background: 'lightgrey',

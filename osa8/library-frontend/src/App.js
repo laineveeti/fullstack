@@ -6,16 +6,27 @@ import BirthyearForm from './components/BirthyearForm';
 import NewBook from './components/NewBook';
 import Navbar from './components/Navbar';
 import Notification from './components/Notification';
+import { NotificationContext } from './NotificationContext';
 import { LoginContext } from './LoginContext';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { useQuery } from '@apollo/client';
-import { ALL_AUTHORS, ALL_BOOKS } from './queries';
+import { useQuery, useSubscription } from '@apollo/client';
+import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED, GENRE_BOOKS } from './queries';
+import { updateBookCache } from './utils/updateCache';
 
 const App = () => {
     const { userQuery } = useContext(LoginContext);
     const booksQuery = useQuery(ALL_BOOKS);
     const authorsQuery = useQuery(ALL_AUTHORS);
+    const { notify } = useContext(NotificationContext);
+
+    useSubscription(BOOK_ADDED, {
+        onData: ({ data, client }) => {
+            const addedBook = data.data.bookAdded;
+            notify(`Book '${addedBook.title}' added`);
+            updateBookCache(client.cache, { query: ALL_BOOKS }, addedBook);
+        },
+    });
 
     if (authorsQuery.loading || userQuery.loading) {
         return <div>loading...</div>;
@@ -29,7 +40,7 @@ const App = () => {
             <Notification />
             <Routes>
                 <Route
-                    path='/authors'
+                    path="/authors"
                     element={
                         <Authors authorsQuery={authorsQuery}>
                             {userQuery ? (
@@ -41,22 +52,46 @@ const App = () => {
                     }
                 />
                 <Route
-                    path='/books'
+                    path="/books"
                     element={<BooksByGenre booksQuery={booksQuery} />}
                 />
                 <Route
-                    path='/recommended'
+                    path="/recommended"
                     element={
                         currentUser ? (
                             <Recommended />
                         ) : (
-                            <Navigate to='/login' replace />
+                            <div>
+                                Login to view recommendations
+                                <LoginForm />
+                            </div>
                         )
                     }
                 />
-                <Route path='/create' element={<NewBook />} />
-                <Route path='/login' element={<LoginForm />} />
-                <Route path='*' element={<Navigate to='/books' replace />} />
+                <Route
+                    path="/create"
+                    element={
+                        currentUser ? (
+                            <NewBook />
+                        ) : (
+                            <div>
+                                Login to add new books
+                                <LoginForm />
+                            </div>
+                        )
+                    }
+                />
+                <Route
+                    path="/login"
+                    element={
+                        !currentUser ? (
+                            <LoginForm />
+                        ) : (
+                            <Navigate to="/books" replace />
+                        )
+                    }
+                />
+                <Route path="*" element={<Navigate to="/books" replace />} />
             </Routes>
         </div>
     );

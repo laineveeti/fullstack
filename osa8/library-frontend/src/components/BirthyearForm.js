@@ -4,7 +4,7 @@ import { EDIT_AUTHOR, ALL_AUTHORS } from '../queries';
 import { NotificationContext } from '../NotificationContext';
 
 const BirthyearForm = ({ authorsQuery }) => {
-    const [, setError] = useContext(NotificationContext);
+    const { notify } = useContext(NotificationContext);
 
     const [editAuthor] = useMutation(EDIT_AUTHOR, {
         refetchQueries: [{ query: ALL_AUTHORS }],
@@ -12,7 +12,7 @@ const BirthyearForm = ({ authorsQuery }) => {
             const messages = error.graphQLErrors
                 .map((e) => e.message)
                 .join('\n');
-            setError(messages);
+            notify(messages);
         },
     });
 
@@ -52,7 +52,7 @@ const BirthyearForm = ({ authorsQuery }) => {
                     value={born}
                 />
                 <br></br>
-                <button type='submit'>update author</button>
+                <button type="submit">update author</button>
             </form>
         </div>
     );

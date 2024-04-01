@@ -12,7 +12,9 @@ const GenreSelector = ({ books, setGenre }) => {
     return (
         <div>
             {genres.map((genre) => (
-                <button onClick={() => setGenre(genre)}>{genre}</button>
+                <button key={genre + '_button'} onClick={() => setGenre(genre)}>
+                    {genre}
+                </button>
             ))}
             <button onClick={() => setGenre('')}>all genres</button>
         </div>

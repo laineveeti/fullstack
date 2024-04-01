@@ -8,14 +8,14 @@ const LoginContextProvider = (props) => {
     const userQuery = useQuery(CURRENT_USER);
     const client = useApolloClient();
 
-    const [, setError] = useContext(NotificationContext);
+    const { notify } = useContext(NotificationContext);
     const [loginMutation, result] = useMutation(LOGIN, {
         onError: (error) => {
             console.log(error.graphQLErrors);
             const messages = error.graphQLErrors
                 .map((e) => e.message)
                 .join('\n');
-            setError(messages);
+            notify(messages);
         },
     });
 

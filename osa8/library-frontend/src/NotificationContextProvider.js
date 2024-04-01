@@ -4,7 +4,7 @@ import { useState } from 'react';
 const NotificationContextProvider = (props) => {
     const [notification, setNotification] = useState(null);
 
-    const setError = (message) => {
+    const notify = (message) => {
         setNotification(message);
         setTimeout(() => {
             setNotification(null);
@@ -12,7 +12,7 @@ const NotificationContextProvider = (props) => {
     };
 
     return (
-        <NotificationContext.Provider value={[notification, setError]}>
+        <NotificationContext.Provider value={{ notification, notify }}>
             {props.children}
         </NotificationContext.Provider>
     );

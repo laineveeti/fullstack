@@ -8,10 +8,10 @@ const Books = ({ books }) => {
                     <th>published</th>
                 </tr>
                 {[...books].map((b) => (
-                    <tr key={b.title}>
-                        <td>{b.title}</td>
-                        <td>{b.author.name}</td>
-                        <td>{b.published}</td>
+                    <tr key={b.id}>
+                        <td key={b.id + '_title'}>{b.title}</td>
+                        <td key={b.id + '_author'}>{b.author.name}</td>
+                        <td key={b.id + '_publish'}>{b.published}</td>
                     </tr>
                 ))}
             </tbody>
