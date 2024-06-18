@@ -3,6 +3,7 @@ import { NewFlightForm } from './components/NewFlightForm';
 import { Content } from './components/Content';
 import { Entry, NewEntry } from './types';
 import { createEntry, getAllEntries } from './services/dataService';
+import { AxiosError } from 'axios';
 
 const App = () => {
     const [entries, setEntries] = useState<Entry[]>([]);
@@ -11,26 +12,26 @@ const App = () => {
         date: '',
         visibility: '',
         weather: '',
+        comment: '',
     });
 
     useEffect(() => {
         getAllEntries().then((data) => {
             setEntries(data);
-            console.log(data);
         });
     }, []);
 
-    const submitForm = (event: React.SyntheticEvent) => {
+    const submitForm = async (event: React.SyntheticEvent) => {
         event.preventDefault();
         try {
-            createEntry(newEntry).then((data) => {
-                console.log('created entry: ' + data);
-                setEntries(entries.concat(data));
-            });
-            setNewEntry({ date: '', visibility: '', weather: '' });
+            const data: Entry = await createEntry(newEntry);
+            setEntries(entries.concat(data));
+            setNewEntry({ date: '', visibility: '', weather: '', comment: '' });
         } catch (error) {
-            if (error instanceof Error) {
-                setNotification(error.message);
+            if (error instanceof AxiosError && error.response) {
+                setNotification(error.response.data);
+            } else {
+                console.error(error);
             }
         }
     };

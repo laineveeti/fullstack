@@ -1,3 +1,3 @@
 export const Notification = ({ msg }: { msg: string }) => {
-    return <p color='red'>{msg}</p>;
+    return <p style={{ color: 'red' } as React.CSSProperties}>{msg}</p>;
 };

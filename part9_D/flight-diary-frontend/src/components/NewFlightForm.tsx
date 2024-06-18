@@ -19,32 +19,65 @@ export const NewFlightForm = ({
             <form>
                 date{' '}
                 <input
+                    type='date'
                     value={newEntry.date}
-                    onChange={(event) =>
-                        setNewEntry({ ...newEntry, date: event.target.value })
-                    }
+                    onChange={(event) => {
+                        event.preventDefault();
+                        setNewEntry({ ...newEntry, date: event.target.value });
+                    }}
                 />
+                <br />
                 visibility{' '}
-                <input
-                    value={newEntry.visibility}
-                    onChange={(event) =>
-                        setNewEntry({
-                            ...newEntry,
-                            visibility: event.target.value,
-                        })
-                    }
-                />
+                {['great', 'good', 'ok', 'poor'].map((choice) => (
+                    <label>
+                        <input
+                            type='radio'
+                            value={choice}
+                            name='visibility'
+                            onChange={(event) => {
+                                setNewEntry({
+                                    ...newEntry,
+                                    visibility: event.target.value,
+                                });
+                            }}
+                        />{' '}
+                        {choice}
+                    </label>
+                ))}
+                <br />
                 weather{' '}
+                {['sunny', 'rainy', 'cloudy', 'stormy', 'windy'].map(
+                    (choice) => (
+                        <label>
+                            <input
+                                type='radio'
+                                value={choice}
+                                name='weather'
+                                onChange={(event) => {
+                                    setNewEntry({
+                                        ...newEntry,
+                                        weather: event.target.value,
+                                    });
+                                }}
+                            />{' '}
+                            {choice}
+                        </label>
+                    )
+                )}
+                <br />
+                comment{' '}
                 <input
-                    value={newEntry.weather}
-                    onChange={(event) =>
+                    value={newEntry.comment}
+                    onChange={(event) => {
+                        event.preventDefault();
                         setNewEntry({
                             ...newEntry,
-                            weather: event.target.value,
-                        })
-                    }
+                            comment: event.target.value,
+                        });
+                    }}
                 />
-                <button onClick={submitForm}>Click here</button>
+                <br />
+                <button onClick={submitForm}>add</button>
             </form>
         </div>
     );

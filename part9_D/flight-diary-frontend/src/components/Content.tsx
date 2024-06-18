@@ -6,7 +6,7 @@ export const Content = ({ entries }: { entries: Entry[] }) => {
         <div>
             <h1>Diary entries</h1>
             {entries.map((e) => (
-                <DiaryEntry entry={e} />
+                <DiaryEntry key={e.id} entry={e} />
             ))}
         </div>
     );
