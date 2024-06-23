@@ -1,33 +1,22 @@
-interface CoursePartBase {
-    name: string;
-    exerciseCount: number;
+export interface Diagnosis {
+  code: string;
+  name: string;
+  latin?: string;
 }
 
-interface CoursePartWithDesc extends CoursePartBase {
-    description: string;
+export enum Gender {
+  Male = "male",
+  Female = "female",
+  Other = "other"
 }
 
-interface CoursePartBasic extends CoursePartWithDesc {
-    kind: 'basic';
+export interface Patient {
+  id: string;
+  name: string;
+  occupation: string;
+  gender: Gender;
+  ssn?: string;
+  dateOfBirth?: string;
 }
 
-interface CoursePartGroup extends CoursePartBase {
-    groupProjectCount: number;
-    kind: 'group';
-}
-
-interface CoursePartBackground extends CoursePartWithDesc {
-    backgroundMaterial: string;
-    kind: 'background';
-}
-
-interface CoursePartSpecial extends CoursePartWithDesc {
-    requirements: string[];
-    kind: 'special';
-}
-
-export type CoursePart =
-    | CoursePartBasic
-    | CoursePartGroup
-    | CoursePartBackground
-    | CoursePartSpecial;
+export type PatientFormValues = Omit<Patient, "id" | "entries">;

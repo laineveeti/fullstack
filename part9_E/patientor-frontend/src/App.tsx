@@ -1,64 +1,45 @@
-import { Content } from './components/Content';
-import { Header } from './components/Header';
-import { Total } from './components/Total';
-import { CoursePart } from './types';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { Button, Divider, Container, Typography } from '@mui/material';
+
+import { apiBaseUrl } from "./constants";
+import { Patient } from "./types";
+
+import patientService from "./services/patients";
+import PatientListPage from "./components/PatientListPage";
 
 const App = () => {
-    const courseName = 'Half Stack application development';
-    const courseParts: CoursePart[] = [
-        {
-            name: 'Fundamentals',
-            exerciseCount: 10,
-            description: 'This is an awesome course part',
-            kind: 'basic',
-        },
-        {
-            name: 'Using props to pass data',
-            exerciseCount: 7,
-            groupProjectCount: 3,
-            kind: 'group',
-        },
-        {
-            name: 'Basics of type Narrowing',
-            exerciseCount: 7,
-            description: 'How to go from unknown to string',
-            kind: 'basic',
-        },
-        {
-            name: 'Deeper type usage',
-            exerciseCount: 14,
-            description: 'Confusing description',
-            backgroundMaterial:
-                'https://type-level-typescript.com/template-literal-types',
-            kind: 'background',
-        },
-        {
-            name: 'TypeScript in frontend',
-            exerciseCount: 10,
-            description: 'a hard part',
-            kind: 'basic',
-        },
-        {
-            name: 'Backend development',
-            exerciseCount: 21,
-            description: 'Typing the backend',
-            requirements: ['nodejs', 'jest'],
-            kind: 'special',
-        },
-    ];
+  const [patients, setPatients] = useState<Patient[]>([]);
 
-    const totalExercises = courseParts.reduce(
-        (sum, part) => sum + part.exerciseCount,
-        0
-    );
+  useEffect(() => {
+    void axios.get<void>(`${apiBaseUrl}/ping`);
 
-    return (
-        <div>
-            <Header courseName={courseName} />
-            <Content courseParts={courseParts} />
-            <Total totalExercises={totalExercises} />
-        </div>
-    );
+    const fetchPatientList = async () => {
+      const patients = await patientService.getAll();
+      setPatients(patients);
+    };
+    void fetchPatientList();
+  }, []);
+  
+  return (
+    <div className="App">
+      <Router>
+        <Container>
+          <Typography variant="h3" style={{ marginBottom: "0.5em" }}>
+            Patientor
+          </Typography>
+          <Button component={Link} to="/" variant="contained" color="primary">
+            Home
+          </Button>
+          <Divider hidden />
+          <Routes>
+            <Route path="/" element={<PatientListPage patients={patients} setPatients={setPatients} />} />
+          </Routes>
+        </Container>
+      </Router>
+    </div>
+  );
 };
 
 export default App;
