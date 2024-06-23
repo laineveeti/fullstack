@@ -15,16 +15,19 @@ export const getDiagnoses = (): Diagnosis[] => {
 };
 
 export const getPatients = (): NonSensitivePatient[] => {
-    return patients.map(({ id, name, dateOfBirth, gender, occupation }) => {
-        const patientToReturn: NonSensitivePatient = {
-            id,
-            name,
-            dateOfBirth,
-            gender,
-            occupation,
-        };
-        return patientToReturn;
-    });
+    return patients.map(
+        ({ id, name, dateOfBirth, gender, occupation, entries }) => {
+            const patientToReturn: NonSensitivePatient = {
+                id,
+                name,
+                dateOfBirth,
+                gender,
+                occupation,
+                entries,
+            };
+            return patientToReturn;
+        }
+    );
 };
 
 export const getPatientData = (id: string): Patient => {
