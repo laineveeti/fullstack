@@ -4,7 +4,7 @@ const isString = (input: unknown): input is string => {
     return typeof input === 'string' || input instanceof String;
 };
 
-const parseString = (input: unknown, fieldName: string): string => {
+export const parseString = (input: unknown, fieldName: string): string => {
     if (!isString(input) || input.length < 1) {
         throw new Error(`Incorrect ${fieldName}: ${input}`);
     }
@@ -43,6 +43,7 @@ export const toNewPatient = (object: unknown): NewPatient => {
             ssn: parseString(object.ssn, 'ssn'),
             gender: parseGender(object.gender),
             occupation: parseString(object.occupation, 'occupation'),
+            entries: [],
         };
         return newPatient;
     }

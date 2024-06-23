@@ -1,1 +1,0 @@
-import Diagnosis from '../types';

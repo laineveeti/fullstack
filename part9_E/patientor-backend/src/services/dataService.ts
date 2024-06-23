@@ -27,6 +27,14 @@ export const getPatients = (): NonSensitivePatient[] => {
     });
 };
 
+export const getPatientData = (id: string): Patient => {
+    const patientData: Patient | undefined = patients.find((p) => p.id === id);
+    if (!patientData) {
+        throw new Error(`Patient with id ${id} not found`);
+    }
+    return patientData;
+};
+
 export const postNewPatient = (object: unknown): Patient => {
     const newPatient: Patient = toNewPatient(object) as Patient;
     newPatient.id = uuid();
