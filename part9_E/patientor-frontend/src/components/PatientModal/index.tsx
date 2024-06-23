@@ -1,7 +1,8 @@
 import { useLoaderData, Params } from 'react-router-dom';
-import patientService from '../services/patients';
+import patientService from '../../services/patients';
 import { Female, Male, Transgender } from '@mui/icons-material';
-import { Patient } from '../types';
+import { Diagnosis, Patient } from '../../types';
+import { EntryBlock } from './EntryBlock';
 
 interface LoaderData {
     patient: Patient;
@@ -19,7 +20,7 @@ export const loader = async ({
     return { patient };
 };
 
-export const PatientPage = () => {
+export const PatientPage = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
     const { patient }: LoaderData = useLoaderData() as LoaderData;
     return (
         <div>
@@ -36,6 +37,14 @@ export const PatientPage = () => {
             ssn: {patient.ssn}
             <br />
             occupation: {patient.occupation}
+            <br />
+            {patient.entries.map((e) => (
+                <EntryBlock
+                    key={`entry_${e.id}`}
+                    entryData={e}
+                    diagnoses={diagnoses}
+                />
+            ))}
         </div>
     );
 };
