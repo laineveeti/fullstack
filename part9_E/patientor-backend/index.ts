@@ -10,11 +10,6 @@ const PORT = 3001;
 
 app.use('/api', router);
 
-app.get('/ping', (_req, res) => {
-    console.log('ping');
-    res.send('pong');
-});
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

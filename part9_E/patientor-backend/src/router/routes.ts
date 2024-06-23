@@ -9,6 +9,11 @@ import { Patient } from '../types';
 
 const router = express.Router();
 
+router.get('/ping', (_req, res) => {
+    console.log('ping');
+    res.send('pong');
+});
+
 router.get('/diagnoses', (_req, res) => {
     res.send(getDiagnoses());
 });
