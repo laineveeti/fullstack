@@ -1,7 +1,7 @@
-import { Diagnosis, Patient, NonSensitivePatient } from '../types';
+import { Diagnosis, Patient, NonSensitivePatient, Entry } from '../types';
 import diagnosisData from '../data/diagnoses';
 import patientData from '../data/patients';
-import { toNewPatient } from '../utils/parsers';
+import { toNewPatient, parseEntry } from '../utils/parsers';
 import { v1 as uuid } from 'uuid';
 
 const patients: Patient[] = patientData.map((obj) => {
@@ -42,4 +42,10 @@ export const postNewPatient = (object: unknown): Patient => {
     const newPatient: Patient = toNewPatient(object) as Patient;
     newPatient.id = uuid();
     return newPatient;
+};
+
+export const postNewEntry = (_id: string, object: unknown): Entry => {
+    const newEntry: Entry = parseEntry(object);
+    newEntry.id = uuid();
+    return newEntry;
 };

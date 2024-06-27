@@ -3,9 +3,10 @@ import {
     getPatients,
     getPatientData,
     postNewPatient,
+    postNewEntry,
 } from '../services/dataService';
 import express from 'express';
-import { Patient } from '../types';
+import { Patient, Entry } from '../types';
 
 const router = express.Router();
 
@@ -37,7 +38,20 @@ router.get('/patients/:id', (req, res) => {
 
 router.post('/patients', (req, res) => {
     try {
-        const newEntry: Patient = postNewPatient(req.body);
+        const newPatient: Patient = postNewPatient(req.body);
+        res.json(newPatient);
+    } catch (error: unknown) {
+        let errorMessage = 'Something went wrong.';
+        if (error instanceof Error) {
+            errorMessage += ' Error: ' + error.message;
+        }
+        res.status(400).send(errorMessage);
+    }
+});
+
+router.post('/patients/:id/entries', (req, res) => {
+    try {
+        const newEntry: Entry = postNewEntry(req.params.id, req.body);
         res.json(newEntry);
     } catch (error: unknown) {
         let errorMessage = 'Something went wrong.';

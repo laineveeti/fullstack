@@ -78,7 +78,13 @@ const App = () => {
                 },
                 {
                     path: '/patients/:id',
-                    element: <PatientPage diagnoses={diagnoses} />,
+                    element: (
+                        <PatientPage
+                            diagnoses={diagnoses}
+                            patientList={patients}
+                            updatePatientList={setPatients}
+                        />
+                    ),
                     loader: patientLoader,
                     errorElement: <ErrorBoundary />,
                 },
