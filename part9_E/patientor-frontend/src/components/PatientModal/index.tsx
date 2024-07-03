@@ -1,12 +1,11 @@
 import { useLoaderData, Params } from 'react-router-dom';
-import patientService from '../../services/patients';
 import { Female, Male, Transgender } from '@mui/icons-material';
 import { Diagnosis, Patient } from '../../types';
 import { EntryBlock } from './EntryBlock';
 import { AddEntryForm } from './AddEntryForm';
 
 interface LoaderData {
-    patient: Patient;
+    patientId: string;
 }
 
 export const loader = async ({
@@ -17,20 +16,26 @@ export const loader = async ({
     if (!params.id) {
         throw new Error('Missing parameter id');
     }
-    const patient: Patient = await patientService.getOne(params.id);
-    return { patient };
+    const patientId: string = params.id;
+    return { patientId };
 };
 
 export const PatientPage = ({
     diagnoses,
-    patientList,
-    updatePatientList,
+    patients,
+    setPatients,
 }: {
     diagnoses: Diagnosis[];
-    patientList: Patient[];
-    updatePatientList: React.Dispatch<React.SetStateAction<Patient[]>>;
+    patients: Patient[];
+    setPatients: React.Dispatch<React.SetStateAction<Patient[]>>;
 }) => {
-    const { patient }: LoaderData = useLoaderData() as LoaderData;
+    const { patientId }: LoaderData = useLoaderData() as LoaderData;
+    const patient: Patient | undefined = patients.find(
+        (p) => p.id === patientId
+    );
+    if (!patient) {
+        return <div>Something went wrong, patient not found.</div>;
+    }
     return (
         <div>
             <h2>
@@ -49,8 +54,8 @@ export const PatientPage = ({
             <br />
             <AddEntryForm
                 patientId={patient.id}
-                patientList={patientList}
-                updatePatientList={updatePatientList}
+                patients={patients}
+                setPatients={setPatients}
             />
             <br />
             <h3>Entries</h3>

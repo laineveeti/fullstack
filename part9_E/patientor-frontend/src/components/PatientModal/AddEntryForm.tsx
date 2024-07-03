@@ -2,25 +2,26 @@ import { useState, SyntheticEvent } from 'react';
 import { Entry, NewHealthCheckEntry, Patient } from '../../types';
 import {
     TextField,
-    SelectChangeEvent,
-    InputLabel,
-    MenuItem,
-    Select,
     Grid,
     Button,
     Box,
+    FormControl,
+    FormLabel,
+    RadioGroup,
+    FormControlLabel,
+    Radio,
 } from '@mui/material';
 import patientService from '../../services/patients';
 import axios from 'axios';
 
 export const AddEntryForm = ({
     patientId,
-    patientList,
-    updatePatientList,
+    patients,
+    setPatients,
 }: {
     patientId: string;
-    patientList: Patient[];
-    updatePatientList: React.Dispatch<React.SetStateAction<Patient[]>>;
+    patients: Patient[];
+    setPatients: React.Dispatch<React.SetStateAction<Patient[]>>;
 }) => {
     const emptyEntry: NewHealthCheckEntry = {
         description: '',
@@ -40,18 +41,19 @@ export const AddEntryForm = ({
                 patientId,
                 newEntry
             );
-            let patientToModify: Patient | undefined = patientList.find(
+            let patientToModify: Patient | undefined = patients.find(
                 (p) => p.id === patientId
             );
             if (patientToModify) {
                 patientToModify.entries =
                     patientToModify.entries.concat(createdEntry);
-                updatePatientList(
-                    patientList
+                setPatients(
+                    patients
                         .filter((p) => p.id !== patientId)
                         .concat(patientToModify)
                 );
             }
+            console.log(patients);
             setNewEntry(emptyEntry);
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
@@ -65,12 +67,21 @@ export const AddEntryForm = ({
                     );
                     console.error(message);
                     setMsg(message);
+                    setTimeout(() => {
+                        setMsg('');
+                    }, 10000);
                 } else {
                     setMsg('Unrecognized axios error');
+                    setTimeout(() => {
+                        setMsg('');
+                    }, 10000);
                 }
             } else {
                 console.error('Unknown error', error);
                 setMsg('Unknown error');
+                setTimeout(() => {
+                    setMsg('');
+                }, 10000);
             }
         }
     };
@@ -80,19 +91,9 @@ export const AddEntryForm = ({
         setNewEntry(emptyEntry);
     };
 
-    const diagnosisCodes = ['shitfuckery', 'ass'];
-
-    const onDiagnosisChange = (event: SelectChangeEvent<string>) => {
-        event.preventDefault();
-        if (typeof event.target.value === 'string') {
-            const value = event.target.value;
-            setNewEntry({ ...newEntry, diagnosisCodes: value.split(',') });
-        }
-    };
-
     return (
-        <Box sx={{ p: 2, border: '1px' }}>
-            <Box>{msg}</Box>
+        <Box sx={{ p: 2, border: 'dashed 2px gray' }}>
+            <Box sx={{ bgcolor: 'red', borderRadius: 1 }}>{msg}</Box>
             <form onSubmit={addEntry}>
                 <TextField
                     label='Description'
@@ -118,41 +119,62 @@ export const AddEntryForm = ({
                         setNewEntry({ ...newEntry, specialist: target.value })
                     }
                 />
+                <FormControl>
+                    <FormLabel>Health rating</FormLabel>
+                    <RadioGroup
+                        row
+                        name='controlled-radio-buttons-group'
+                        onChange={(event) =>
+                            setNewEntry({
+                                ...newEntry,
+                                healthCheckRating: Number(event.target.value),
+                            })
+                        }
+                    >
+                        <FormControlLabel
+                            value={0}
+                            control={<Radio />}
+                            label='Healthy'
+                        />
+                        <FormControlLabel
+                            value={1}
+                            control={<Radio />}
+                            label='Low risk'
+                        />
+                        <FormControlLabel
+                            value={2}
+                            control={<Radio />}
+                            label='High risk'
+                        />
+                        <FormControlLabel
+                            value={3}
+                            control={<Radio />}
+                            label='Critical'
+                        />
+                    </RadioGroup>
+                </FormControl>
+
                 <TextField
-                    label='Healthcheck rating'
+                    label='Diagnosis codes'
                     fullWidth
-                    value={newEntry.healthCheckRating}
+                    value={
+                        newEntry.diagnosisCodes
+                            ? newEntry.diagnosisCodes.join(',')
+                            : ''
+                    }
                     onChange={({ target }) =>
                         setNewEntry({
                             ...newEntry,
-                            healthCheckRating: Number(target.value),
+                            diagnosisCodes: target.value.split(','),
                         })
                     }
                 />
-
-                <InputLabel style={{ marginTop: 20 }}>
-                    Diagnosis codes
-                </InputLabel>
-                <Select
-                    label='Diagnosis'
-                    fullWidth
-                    multiple
-                    value={newEntry.diagnosisCodes}
-                    onChange={onDiagnosisChange}
-                >
-                    {diagnosisCodes.map((code) => (
-                        <MenuItem key={code} value={code}>
-                            {code}
-                        </MenuItem>
-                    ))}
-                </Select>
 
                 <Grid>
                     <Grid item>
                         <Button
                             color='secondary'
                             variant='contained'
-                            style={{ float: 'left' }}
                             type='button'
                             onClick={onCancel}
                         >
@@ -160,13 +182,7 @@ export const AddEntryForm = ({
                         </Button>
                     </Grid>
                     <Grid item>
-                        <Button
-                            style={{
-                                float: 'right',
-                            }}
-                            type='submit'
-                            variant='contained'
-                        >
+                        <Button type='submit' variant='contained'>
                             Add
                         </Button>
                     </Grid>

@@ -81,8 +81,8 @@ const App = () => {
                     element: (
                         <PatientPage
                             diagnoses={diagnoses}
-                            patientList={patients}
-                            updatePatientList={setPatients}
+                            patients={patients}
+                            setPatients={setPatients}
                         />
                     ),
                     loader: patientLoader,

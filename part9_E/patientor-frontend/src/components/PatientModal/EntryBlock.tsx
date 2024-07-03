@@ -111,7 +111,7 @@ export const EntryBlock = ({
     };
 
     return (
-        <Box component='section' sx={{ p: 1, border: '2px' }}>
+        <Box sx={{ p: 1, border: '2px solid grey', borderRadius: 2 }}>
             <EntryDetails entry={entryData} />
             <ul>
                 {entryData.diagnosisCodes &&
