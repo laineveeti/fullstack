@@ -45,7 +45,7 @@ export const postNewPatient = (object: unknown): Patient => {
 };
 
 export const postNewEntry = (_id: string, object: unknown): Entry => {
-    const newEntry: Entry = parseEntry(object);
+    const newEntry: Entry = parseEntry(object) as Entry;
     newEntry.id = uuid();
     return newEntry;
 };
